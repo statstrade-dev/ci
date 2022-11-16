@@ -1,0 +1,40 @@
+name: Deploy Code
+
+on: [push, workflow_dispatch]
+
+jobs:
+  
+  build-container:
+    runs-on: ubuntu-latest
+      
+    steps:
+      - name: Log into registry ${{ env.REGISTRY }}
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ secrets.GH_USER }}
+          password: ${{ secrets.GH_TOKEN }}
+      
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          repository: statstrade-dev/statstrade-core
+          token: ${{ secrets.GH_TOKEN }}
+          
+      - name: Write SSH keys
+        shell: bash
+        run: |
+          install -m 600 -D /dev/null ~/.ssh/id_rsa
+          echo "${{ secrets.GH_PRIVATE_COMMIT_KEY }}" > ~/.ssh/id_rsa
+          ssh-keyscan -H github.com > ~/.ssh/known_hosts
+          
+      - name: Deploying code
+        run: >
+          docker run --network host
+          -v /var/run/docker.sock:/var/run/docker.sock
+          -v $HOME/.ssh:/root/.ssh
+          -v $(pwd):$(pwd) -w $(pwd) 
+          -e "GITHUB_TOKEN=${{ secrets.GH_TOKEN }}"  
+          -e "GITHUB_USER=${{ secrets.GH_USER }}"
+          ghcr.io/zcaudate/foundation-embed:main lein main-deploy
