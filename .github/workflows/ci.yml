@@ -32,5 +32,83 @@ jobs:
         run: docker run -d --rm --network host --name postgres -e "POSTGRES_DB=test-scratch" -e "POSTGRES_PASSWORD=postgres" -e "POSTGRES_PORT=5432" -e "POSTGRES_USER=postgres" ghcr.io/zcaudate/infra-db:main
         
       - name: statsdb tests
-        run: docker run --rm --network host -v $(pwd):$(pwd) -w $(pwd) zcaudate/foundation-embed:main lein test-db
+        run: docker run --rm --network host -v $(pwd):$(pwd) -w $(pwd) ghcr.io/zcaudate/foundation-embed:main lein test-db
 
+  run-test-net:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout Statstrade
+        uses: actions/checkout@v3
+        with:
+          repository: statstrade-dev/statstrade-core
+          token: ${{ secrets.GH_TOKEN }}
+          
+      - name: Log into registry ${{ env.REGISTRY }}
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ secrets.GH_USER }}
+          password: ${{ secrets.GH_TOKEN }}
+
+      - name: Setup postgres
+        run: docker run -d --rm --network host --name postgres -e "POSTGRES_DB=test-scratch" -e "POSTGRES_PASSWORD=postgres" -e "POSTGRES_PORT=5432" -e "POSTGRES_USER=postgres" ghcr.io/zcaudate/infra-net:main
+        
+      - name: statsnet tests
+        run: docker run --rm --network host -v $(pwd):$(pwd) -w $(pwd) ghcr.io/zcaudate/foundation-embed:main lein test-net
+
+
+  run-test-link:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout Statstrade
+        uses: actions/checkout@v3
+        with:
+          repository: statstrade-dev/statstrade-core
+          token: ${{ secrets.GH_TOKEN }}
+          
+      - name: Log into registry ${{ env.REGISTRY }}
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ secrets.GH_USER }}
+          password: ${{ secrets.GH_TOKEN }}
+
+      - name: Setup postgres
+        run: docker run -d --rm --network host --name postgres -e "POSTGRES_DB=test-scratch" -e "POSTGRES_PASSWORD=postgres" -e "POSTGRES_PORT=5432" -e "POSTGRES_USER=postgres" ghcr.io/zcaudate/infra-link:main
+        
+      - name: statslink tests
+        run: docker run --rm --network host -v $(pwd):$(pwd) -w $(pwd) ghcr.io/zcaudate/foundation-embed:main lein test-link
+
+  run-test-pay:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout Statstrade
+        uses: actions/checkout@v3
+        with:
+          repository: statstrade-dev/statstrade-core
+          token: ${{ secrets.GH_TOKEN }}
+          
+      - name: Log into registry ${{ env.REGISTRY }}
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ secrets.GH_USER }}
+          password: ${{ secrets.GH_TOKEN }}
+
+      - name: Setup postgres
+        run: docker run -d --rm --network host --name postgres -e "POSTGRES_DB=test-scratch" -e "POSTGRES_PASSWORD=postgres" -e "POSTGRES_PORT=5432" -e "POSTGRES_USER=postgres" ghcr.io/zcaudate/infra-pay:main
+        
+      - name: statspay tests
+        run: docker run --rm --network host -v $(pwd):$(pwd) -w $(pwd) ghcr.io/zcaudate/foundation-embed:main lein test-pay
