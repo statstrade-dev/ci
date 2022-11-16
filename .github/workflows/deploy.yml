@@ -1,6 +1,6 @@
 name: Deploy Code
 
-on: [push, repository_dispatch]
+on: [repository_dispatch]
 
 jobs:
   
