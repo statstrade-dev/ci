@@ -55,7 +55,7 @@ jobs:
           password: ${{ secrets.GH_TOKEN }}
 
       - name: Setup postgres
-        run: docker run -d --rm --network host --name postgres -e "POSTGRES_DB=test-scratch" -e "POSTGRES_PASSWORD=postgres" -e "POSTGRES_PORT=5432" -e "POSTGRES_USER=postgres" ghcr.io/zcaudate/infra-net:main
+        run: docker run -d --rm --network host --name postgres -e "POSTGRES_DB=test-scratch" -e "POSTGRES_PASSWORD=postgres" -e "POSTGRES_PORT=5432" -e "POSTGRES_USER=postgres" ghcr.io/zcaudate/infra-db:main
         
       - name: statsnet tests
         run: docker run --rm --network host -v $(pwd):$(pwd) -w $(pwd) ghcr.io/zcaudate/foundation-embed:main lein test-net
@@ -82,7 +82,7 @@ jobs:
           password: ${{ secrets.GH_TOKEN }}
 
       - name: Setup postgres
-        run: docker run -d --rm --network host --name postgres -e "POSTGRES_DB=test-scratch" -e "POSTGRES_PASSWORD=postgres" -e "POSTGRES_PORT=5432" -e "POSTGRES_USER=postgres" ghcr.io/zcaudate/infra-link:main
+        run: docker run -d --rm --network host --name postgres -e "POSTGRES_DB=test-scratch" -e "POSTGRES_PASSWORD=postgres" -e "POSTGRES_PORT=5432" -e "POSTGRES_USER=postgres" ghcr.io/zcaudate/infra-db:main
         
       - name: statslink tests
         run: docker run --rm --network host -v $(pwd):$(pwd) -w $(pwd) ghcr.io/zcaudate/foundation-embed:main lein test-link
@@ -108,7 +108,7 @@ jobs:
           password: ${{ secrets.GH_TOKEN }}
 
       - name: Setup postgres
-        run: docker run -d --rm --network host --name postgres -e "POSTGRES_DB=test-scratch" -e "POSTGRES_PASSWORD=postgres" -e "POSTGRES_PORT=5432" -e "POSTGRES_USER=postgres" ghcr.io/zcaudate/infra-pay:main
+        run: docker run -d --rm --network host --name postgres -e "POSTGRES_DB=test-scratch" -e "POSTGRES_PASSWORD=postgres" -e "POSTGRES_PORT=5432" -e "POSTGRES_USER=postgres" ghcr.io/zcaudate/infra-db:main
         
       - name: statspay tests
         run: docker run --rm --network host -v $(pwd):$(pwd) -w $(pwd) ghcr.io/zcaudate/foundation-embed:main lein test-pay
