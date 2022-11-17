@@ -1,0 +1,210 @@
+name: Build
+
+on: [push, repository_dispatch, workflow_dispatch]
+
+jobs:
+  
+  push-github:
+    runs-on: ubuntu-latest
+      
+    steps:
+      - name: Write SSH keys
+        shell: bash
+        run: |
+          install -m 600 -D /dev/null ~/.ssh/id_rsa
+          echo "${{ secrets.GH_PRIVATE_COMMIT_KEY }}" > ~/.ssh/id_rsa
+          ssh-keyscan -H github.com > ~/.ssh/known_hosts
+ 
+      - name: Log into registry ${{ env.REGISTRY }}
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ secrets.GH_USER }}
+          password: ${{ secrets.GH_TOKEN }}
+          
+      - name: Checkout foundation-base
+        uses: actions/checkout@v3
+        with:
+          repository: zcaudate/foundation-base
+          path: foundation-base
+          token: ${{ secrets.GH_TOKEN }}
+          
+      - name: Checkout foundation-embed
+        uses: actions/checkout@v3
+        with:
+          repository: zcaudate/foundation-embed
+          path: foundation-embed
+          token: ${{ secrets.GH_TOKEN }}
+          
+      - name: Checkout foundation-fx
+        uses: actions/checkout@v3
+        with:
+          repository: zcaudate/foundation-fx
+          path: foundation-fx
+          token: ${{ secrets.GH_TOKEN }}
+          
+      - name: Checkout statstrade-core
+        uses: actions/checkout@v3
+        with:
+          repository: statstrade-dev/statstrade-core
+          path: statstrade-core
+          token: ${{ secrets.GH_TOKEN }}
+          
+      - name: Checkout statstrade-edge
+        uses: actions/checkout@v3
+        with:
+          repository: statstrade-dev/statstrade-edge
+          path: statstrade-edge
+          token: ${{ secrets.GH_TOKEN }}
+
+                    
+      - name: Deploying statstrade-core
+        run: >
+          docker run --network host
+          -v /var/run/docker.sock:/var/run/docker.sock
+          -v $HOME/.ssh:/root/.ssh
+          -v $(pwd):$(pwd) -w $(pwd) 
+          -e "GITHUB_TOKEN=${{ secrets.GH_TOKEN }}"  
+          -e "GITHUB_USER=${{ secrets.GH_USER }}"
+          ghcr.io/zcaudate/foundation-ci:main 
+          bash -c "cd statstrade-core && make setup-checkouts && git config --global --add safe.directory '*' && lein push-core-code"
+
+      - name: Deploying statstrade-edge
+        run: >
+          docker run --network host
+          -v /var/run/docker.sock:/var/run/docker.sock
+          -v $HOME/.ssh:/root/.ssh
+          -v $(pwd):$(pwd) -w $(pwd)
+          -e "GITHUB_TOKEN=${{ secrets.GH_TOKEN }}"  
+          -e "GITHUB_USER=${{ secrets.GH_USER }}"
+          ghcr.io/zcaudate/foundation-ci:main 
+          bash -c "cd statstrade-edge && make setup-checkouts && git config --global --add safe.directory '*' && lein push-edge-code"
+          
+  push-containers:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Write SSH keys
+        shell: bash
+        run: |
+          install -m 600 -D /dev/null ~/.ssh/id_rsa
+          echo "${{ secrets.GH_PRIVATE_COMMIT_KEY }}" > ~/.ssh/id_rsa
+          ssh-keyscan -H github.com > ~/.ssh/known_hosts
+ 
+      - name: Log into registry ${{ env.REGISTRY }}
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ secrets.GH_USER }}
+          password: ${{ secrets.GH_TOKEN }}
+          
+      - name: Checkout foundation-base
+        uses: actions/checkout@v3
+        with:
+          repository: zcaudate/foundation-base
+          path: foundation-base
+          token: ${{ secrets.GH_TOKEN }}
+          
+      - name: Checkout foundation-embed
+        uses: actions/checkout@v3
+        with:
+          repository: zcaudate/foundation-embed
+          path: foundation-embed
+          token: ${{ secrets.GH_TOKEN }}
+          
+      - name: Checkout foundation-fx
+        uses: actions/checkout@v3
+        with:
+          repository: zcaudate/foundation-fx
+          path: foundation-fx
+          token: ${{ secrets.GH_TOKEN }}
+          
+      - name: Checkout statstrade-core
+        uses: actions/checkout@v3
+        with:
+          repository: statstrade-dev/statstrade-core
+          path: statstrade-core
+          token: ${{ secrets.GH_TOKEN }}
+          
+      - name: Checkout statstrade-edge
+        uses: actions/checkout@v3
+        with:
+          repository: statstrade-dev/statstrade-edge
+          path: statstrade-edge
+          token: ${{ secrets.GH_TOKEN }}
+
+      - name: Push Containers
+        run: >
+          docker run --network host
+          -v /var/run/docker.sock:/var/run/docker.sock
+          -v $HOME/.ssh:/root/.ssh
+          -v $(pwd):$(pwd)
+          -w $(pwd)
+          -e "GITHUB_TOKEN=${{ secrets.GH_TOKEN }}"
+          -e "GITHUB_USER=${{ secrets.GH_USER }}"
+          ghcr.io/zcaudate/foundation-ci:main
+          bash -c "docker login -p ${{ secrets.GH_TOKEN }} -u ${{ secrets.GH_USER }} ghcr.io
+          && git config --global --add safe.directory '*'
+          && cd statstrade-edge && make setup-checkouts && lein push-edge-image"
+    
+      - name: Notify Deploy
+        uses: peter-evans/repository-dispatch@v2
+        with:
+          token: ${{ secrets.GH_TOKEN }}
+          repository: statstrade-dev/ci-deploy
+          event-type: deploy
+
+  incomplete-core:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          repository: statstrade-dev/statstrade-core
+          token: ${{ secrets.GH_TOKEN }}
+ 
+      - name: Log into registry ${{ env.REGISTRY }}
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ secrets.GH_USER }}
+          password: ${{ secrets.GH_TOKEN }}
+        
+      - name: List base incomplete
+        run: > 
+          docker run --network host 
+          -v /var/run/docker.sock:/var/run/docker.sock 
+          -v $(pwd):$(pwd) 
+          -w $(pwd) 
+          ghcr.io/zcaudate/foundation-ci:main lein incomplete
+
+
+  incomplete-edge:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          repository: statstrade-dev/statstrade-edge
+          token: ${{ secrets.GH_TOKEN }}
+ 
+      - name: Log into registry ${{ env.REGISTRY }}
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ secrets.GH_USER }}
+          password: ${{ secrets.GH_TOKEN }}
+        
+      - name: List base incomplete
+        run: > 
+          docker run --network host 
+          -v /var/run/docker.sock:/var/run/docker.sock 
+          -v $(pwd):$(pwd) 
+          -w $(pwd) 
+          ghcr.io/zcaudate/foundation-ci:main lein incomplete
