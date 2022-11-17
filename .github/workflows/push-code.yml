@@ -58,8 +58,6 @@ jobs:
           path: statstrade-edge
           token: ${{ secrets.GH_TOKEN }}
 
-      - name: Inititalise statstrade-core
-        run: cd statstrade-core && make setup-checkouts
                     
       - name: Deploying statstrade-core
         run: >
@@ -70,10 +68,7 @@ jobs:
           -e "GITHUB_TOKEN=${{ secrets.GH_TOKEN }}"  
           -e "GITHUB_USER=${{ secrets.GH_USER }}"
           ghcr.io/zcaudate/foundation-ci:main 
-          bash -c "cd statstrade-core && git config --global --add safe.directory '*' && lein push-core-code"
-
-      - name: Inititalise statstrade-edge
-        run: cd statstrade-edge && make setup-checkouts
+          bash -c "cd statstrade-core && make setup-checkouts && git config --global --add safe.directory '*' && lein push-core-code"
 
       - name: Deploying statstrade-edge
         run: >
@@ -84,4 +79,4 @@ jobs:
           -e "GITHUB_TOKEN=${{ secrets.GH_TOKEN }}"  
           -e "GITHUB_USER=${{ secrets.GH_USER }}"
           ghcr.io/zcaudate/foundation-ci:main 
-          bash -c "cd statstrade-edge && git config --global --add safe.directory '*' && lein push-edge-code"
+          bash -c "cd statstrade-edge && make setup-checkouts && git config --global --add safe.directory '*' && lein push-edge-code"

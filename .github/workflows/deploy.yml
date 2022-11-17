@@ -57,15 +57,15 @@ jobs:
 
       - name: Push Containers
         run: >
-          cd statstrade-edge && docker run --network host
+          docker run --network host
           -v /var/run/docker.sock:/var/run/docker.sock
           -v $HOME/.ssh:/root/.ssh
           -v $(pwd):$(pwd)
-          -v $(pwd)/../statstrade-core:$(pwd)/../statstrade-core
           -w $(pwd)
           -e "GITHUB_TOKEN=${{ secrets.GH_TOKEN }}"
           -e "GITHUB_USER=${{ secrets.GH_USER }}"
-          ghcr.io/zcaudate/foundation-ci:main bash -c "docker login -p ${{ secrets.GH_TOKEN }} -u ${{ secrets.GH_USER }} ghcr.io && lein push-edge-image"
+          ghcr.io/zcaudate/foundation-ci:main
+          bash -c "cd statstrade-edge && docker login -p ${{ secrets.GH_TOKEN }} -u ${{ secrets.GH_USER }} ghcr.io && lein push-edge-image"
     
       - name: Notify Deploy
         uses: peter-evans/repository-dispatch@v2
