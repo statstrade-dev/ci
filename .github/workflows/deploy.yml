@@ -1,0 +1,51 @@
+name: Deploy Code
+
+on: [push, repository_dispatch, workflow_dispatch]
+
+jobs:
+
+  build-container:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Log into registry ${{ env.REGISTRY }}
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ secrets.GH_USER }}
+          password: ${{ secrets.GH_TOKEN }}
+
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          repository: statstrade-dev/statstrade-core
+          path: statstrade-core
+          token: ${{ secrets.GH_TOKEN }}
+
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          repository: statstrade-dev/statstrade-edge
+          path: statstrade-edge
+          token: ${{ secrets.GH_TOKEN }}
+
+      - name: Inititalise Repo
+        run: >
+          cd statstrade-edge
+          && mkdir -p checkouts
+          && cd checkouts
+          && ln -s ../../statstrade-core  statstrade-core
+
+      - name: Pushing Containers
+        run: >
+          cd statstrade-edge && docker run --network host
+          -v /var/run/docker.sock:/var/run/docker.sock
+          -v $HOME/.ssh:/root/.ssh
+          -v $(pwd):$(pwd)
+          -v $(pwd)/../statstrade-core:$(pwd)/../statstrade-core
+          -w $(pwd)
+          -e "GITHUB_TOKEN=${{ secrets.GH_TOKEN }}"
+          -e "GITHUB_USER=${{ secrets.GH_USER }}"
+          ghcr.io/zcaudate/foundation-embed:ci bash -c "docker login -p ${{ secrets.GH_TOKEN }} -u ${{ secrets.GH_USER }} ghcr.io && lein main-push"
