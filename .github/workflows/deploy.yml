@@ -55,7 +55,7 @@ jobs:
       - name: Inititalise Repo
         run: cd statstrade-edge && make setup-checkouts
 
-      - name: Deploy Containers
+      - name: Push Containers
         run: >
           cd statstrade-edge && docker run --network host
           -v /var/run/docker.sock:/var/run/docker.sock
@@ -66,3 +66,11 @@ jobs:
           -e "GITHUB_TOKEN=${{ secrets.GH_TOKEN }}"
           -e "GITHUB_USER=${{ secrets.GH_USER }}"
           ghcr.io/zcaudate/foundation-embed:ci bash -c "docker login -p ${{ secrets.GH_TOKEN }} -u ${{ secrets.GH_USER }} ghcr.io && lein main-push"
+    
+      - name: Notify Deploy
+        uses: peter-evans/repository-dispatch@v2
+        with:
+          token: ${{ secrets.GH_TOKEN }}
+          repository: statstrade-dev/ci-deploy
+          event-type: deploy
+
