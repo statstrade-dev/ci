@@ -1,10 +1,10 @@
-name: Deploy Code
+name: Version Code
 
-on: [repository_dispatch]
+on: [push, repository_dispatch]
 
 jobs:
   
-  build-container:
+  version-code:
     runs-on: ubuntu-latest
       
     steps:
