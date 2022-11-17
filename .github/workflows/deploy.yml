@@ -63,8 +63,8 @@ jobs:
           -e "GITHUB_USER=${{ secrets.GH_USER }}"
           ghcr.io/zcaudate/foundation-ci:main
           bash -c "docker login -p ${{ secrets.GH_TOKEN }} -u ${{ secrets.GH_USER }} ghcr.io
-            && git config --global --add safe.directory '*' 
-            && cd statstrade-edge && make setup-checkouts && lein push-edge-image"
+          && git config --global --add safe.directory '*'
+          && cd statstrade-edge && make setup-checkouts && lein push-edge-image"
     
       - name: Notify Deploy
         uses: peter-evans/repository-dispatch@v2
