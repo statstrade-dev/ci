@@ -37,5 +37,5 @@ jobs:
           -v $(pwd):$(pwd) -w $(pwd) 
           -e "GITHUB_TOKEN=${{ secrets.GH_TOKEN }}"  
           -e "GITHUB_USER=${{ secrets.GH_USER }}"
-          ghcr.io/zcaudate/foundation-embed:main 
+          ghcr.io/zcaudate/foundation-ci:main 
           bash -c "git config --global --add safe.directory '*' && lein main-deploy"
