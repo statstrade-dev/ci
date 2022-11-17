@@ -1,10 +1,10 @@
-name: Version Code
+name: Push Code
 
 on: [push, repository_dispatch]
 
 jobs:
   
-  version-code:
+  push-code:
     runs-on: ubuntu-latest
       
     steps:
@@ -70,7 +70,7 @@ jobs:
           -e "GITHUB_TOKEN=${{ secrets.GH_TOKEN }}"  
           -e "GITHUB_USER=${{ secrets.GH_USER }}"
           ghcr.io/zcaudate/foundation-ci:main 
-          bash -c "cd statstrade-core && git config --global --add safe.directory '*' && lein main-deploy"
+          bash -c "cd statstrade-core && git config --global --add safe.directory '*' && lein push-core-code"
 
       - name: Inititalise statstrade-edge
         run: cd statstrade-edge && make setup-checkouts
@@ -80,8 +80,8 @@ jobs:
           docker run --network host
           -v /var/run/docker.sock:/var/run/docker.sock
           -v $HOME/.ssh:/root/.ssh
-          -v $(pwd):$(pwd) -w $(pwd) 
+          -v $(pwd):$(pwd) -w $(pwd)
           -e "GITHUB_TOKEN=${{ secrets.GH_TOKEN }}"  
           -e "GITHUB_USER=${{ secrets.GH_USER }}"
           ghcr.io/zcaudate/foundation-ci:main 
-          bash -c "cd statstrade-edge && git config --global --add safe.directory '*' && lein main-deploy"
+          bash -c "cd statstrade-edge && git config --global --add safe.directory '*' && lein push-edge-code"
