@@ -17,14 +17,14 @@ jobs:
           username: ${{ secrets.GH_USER }}
           password: ${{ secrets.GH_TOKEN }}
 
-      - name: Checkout repository
+      - name: Checkout core repository
         uses: actions/checkout@v3
         with:
           repository: statstrade-dev/statstrade-core
           path: statstrade-core
           token: ${{ secrets.GH_TOKEN }}
 
-      - name: Checkout repository
+      - name: Checkout edge repository
         uses: actions/checkout@v3
         with:
           repository: statstrade-dev/statstrade-edge
@@ -40,12 +40,11 @@ jobs:
 
       - name: Pushing Containers
         run: >
-          cd statstrade-edge && docker run --network host
+          docker run --network host
           -v /var/run/docker.sock:/var/run/docker.sock
           -v $HOME/.ssh:/root/.ssh
           -v $(pwd):$(pwd)
-          -v $(pwd)/../statstrade-core:$(pwd)/../statstrade-core
           -w $(pwd)
           -e "GITHUB_TOKEN=${{ secrets.GH_TOKEN }}"
           -e "GITHUB_USER=${{ secrets.GH_USER }}"
-          ghcr.io/zcaudate/foundation-embed:ci bash -c "docker login -p ${{ secrets.GH_TOKEN }} -u ${{ secrets.GH_USER }} ghcr.io && lein main-push"
+          ghcr.io/zcaudate/foundation-ci:main bash -c "cd statstrade-edge && docker login -p ${{ secrets.GH_TOKEN }} -u ${{ secrets.GH_USER }} ghcr.io && lein main-push"
