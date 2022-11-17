@@ -16,15 +16,36 @@ jobs:
           registry: ghcr.io
           username: ${{ secrets.GH_USER }}
           password: ${{ secrets.GH_TOKEN }}
-
-      - name: Checkout core repository
+          
+      - name: Checkout foundation-base
+        uses: actions/checkout@v3
+        with:
+          repository: zcaudate/foundation-base
+          path: foundation-base
+          token: ${{ secrets.GH_TOKEN }}
+          
+      - name: Checkout foundation-embed
+        uses: actions/checkout@v3
+        with:
+          repository: zcaudate/foundation-embed
+          path: foundation-embed
+          token: ${{ secrets.GH_TOKEN }}
+          
+      - name: Checkout foundation-fx
+        uses: actions/checkout@v3
+        with:
+          repository: zcaudate/foundation-fx
+          path: foundation-fx
+          token: ${{ secrets.GH_TOKEN }}
+          
+      - name: Checkout statstrade-core
         uses: actions/checkout@v3
         with:
           repository: statstrade-dev/statstrade-core
           path: statstrade-core
           token: ${{ secrets.GH_TOKEN }}
-
-      - name: Checkout edge repository
+          
+      - name: Checkout statstrade-edge
         uses: actions/checkout@v3
         with:
           repository: statstrade-dev/statstrade-edge
@@ -32,19 +53,16 @@ jobs:
           token: ${{ secrets.GH_TOKEN }}
 
       - name: Inititalise Repo
-        run: >
-          cd statstrade-edge
-          && mkdir -p checkouts
-          && cd checkouts
-          && ln -s ../../statstrade-core  statstrade-core
+        run: cd statstrade-edge && make setup-checkouts
 
-      - name: Pushing Containers
+      - name: Deploy Containers
         run: >
-          docker run --network host
+          cd statstrade-edge && docker run --network host
           -v /var/run/docker.sock:/var/run/docker.sock
           -v $HOME/.ssh:/root/.ssh
           -v $(pwd):$(pwd)
+          -v $(pwd)/../statstrade-core:$(pwd)/../statstrade-core
           -w $(pwd)
           -e "GITHUB_TOKEN=${{ secrets.GH_TOKEN }}"
           -e "GITHUB_USER=${{ secrets.GH_USER }}"
-          ghcr.io/zcaudate/foundation-ci:main bash -c "cd statstrade-edge && docker login -p ${{ secrets.GH_TOKEN }} -u ${{ secrets.GH_USER }} ghcr.io && lein main-push"
+          ghcr.io/zcaudate/foundation-embed:ci bash -c "docker login -p ${{ secrets.GH_TOKEN }} -u ${{ secrets.GH_USER }} ghcr.io && lein main-push"
