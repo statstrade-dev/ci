@@ -3,9 +3,9 @@ name: Run Edge Tests
 # Controls when the workflow will run
 on:
   repository_dispatch:
-    types: [foundation-changed, core-changed, edge-changed, all]
+    types: [core-changed, edge-changed, all]
   workflow_dispatch:
-    types: [foundation-changed, core-changed, edge-changed, all]
+    types: [core-changed, edge-changed, all]
 
 jobs:
 
