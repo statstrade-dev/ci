@@ -114,6 +114,13 @@ jobs:
           path: foundation-base
           token: ${{ secrets.GH_TOKEN }}
           
+      - name: Checkout foundation-web
+        uses: actions/checkout@v3
+        with:
+          repository: zcaudate/foundation-web
+          path: foundation-web
+          token: ${{ secrets.GH_TOKEN }}
+          
       - name: Checkout foundation-embed
         uses: actions/checkout@v3
         with:
