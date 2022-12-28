@@ -13,7 +13,7 @@ jobs:
   run-test-db:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 12
 
     steps:
           
