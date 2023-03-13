@@ -65,7 +65,7 @@ jobs:
   run-test-net:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
 
     steps:
       - name: Checkout foundation-base
@@ -116,7 +116,7 @@ jobs:
   run-test-link:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
 
     steps:
       - name: Checkout foundation-base
