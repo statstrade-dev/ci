@@ -1,4 +1,4 @@
-name: Build
+name: Push and Deploy
 
 on: [push, repository_dispatch, workflow_dispatch]
 
@@ -169,56 +169,3 @@ jobs:
           token: ${{ secrets.GH_TOKEN }}
           repository: statstrade-dev/ci-deploy
           event-type: deploy
-
-  incomplete-core:
-    runs-on: ubuntu-latest
-    timeout-minutes: 3
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-        with:
-          repository: statstrade-dev/statstrade-core
-          token: ${{ secrets.GH_TOKEN }}
- 
-      - name: Log into registry ${{ env.REGISTRY }}
-        if: github.event_name != 'pull_request'
-        uses: docker/login-action@v2
-        with:
-          registry: ghcr.io
-          username: ${{ secrets.GH_USER }}
-          password: ${{ secrets.GH_TOKEN }}
-        
-      - name: List base incomplete
-        run: > 
-          docker run --network host 
-          -v /var/run/docker.sock:/var/run/docker.sock 
-          -v $(pwd):$(pwd) 
-          -w $(pwd) 
-          ghcr.io/zcaudate/foundation-ci:main lein incomplete
-
-
-  incomplete-edge:
-    runs-on: ubuntu-latest
-    timeout-minutes: 3
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-        with:
-          repository: statstrade-dev/statstrade-edge
-          token: ${{ secrets.GH_TOKEN }}
- 
-      - name: Log into registry ${{ env.REGISTRY }}
-        if: github.event_name != 'pull_request'
-        uses: docker/login-action@v2
-        with:
-          registry: ghcr.io
-          username: ${{ secrets.GH_USER }}
-          password: ${{ secrets.GH_TOKEN }}
-        
-      - name: List base incomplete
-        run: > 
-          docker run --network host 
-          -v /var/run/docker.sock:/var/run/docker.sock 
-          -v $(pwd):$(pwd) 
-          -w $(pwd) 
-          ghcr.io/zcaudate/foundation-ci:main lein incomplete
