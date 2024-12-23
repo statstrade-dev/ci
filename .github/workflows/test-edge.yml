@@ -64,5 +64,5 @@ jobs:
       - name: Run statspay tests
         run: >
           docker run --rm --network host -v $(pwd):$(pwd) -w $(pwd) 
-          ghcr.io/zcaudate-xyz/infra-foundation-ci:main 
+          ghcr.io/zcaudate-xyz/infra-foundation-test:main 
           bash -c 'cd statstrade-edge && make setup-checkouts && lein test'

@@ -59,7 +59,7 @@ jobs:
       - name: Run statsdb tests
         run: >
           docker run --rm --network host -v $(pwd):$(pwd) -w $(pwd) 
-          ghcr.io/zcaudate-xyz/infra-foundation-ci:main 
+          ghcr.io/zcaudate-xyz/infra-foundation-test:main 
           bash -c 'cd statstrade-core && make setup-checkouts && lein test-db'
 
   run-test-net:
@@ -110,7 +110,7 @@ jobs:
       - name: Run statsnet tests
         run: >
           docker run --rm --network host -v $(pwd):$(pwd) -w $(pwd) 
-          ghcr.io/zcaudate-xyz/infra-foundation-ci:main 
+          ghcr.io/zcaudate-xyz/infra-foundation-test:main 
           bash -c 'cd statstrade-core && make setup-checkouts && lein test-net'
 
   run-test-link:
@@ -161,7 +161,7 @@ jobs:
       - name: Run statslink tests
         run: >
           docker run --rm --network host -v $(pwd):$(pwd) -w $(pwd) 
-          ghcr.io/zcaudate-xyz/infra-foundation-ci:main 
+          ghcr.io/zcaudate-xyz/infra-foundation-test:main 
           bash -c 'cd statstrade-core && make setup-checkouts && lein test-link'
 
 #  run-test-iberia:
