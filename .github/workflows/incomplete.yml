@@ -1,4 +1,4 @@
-name: Check Imcomplete
+name: Check Incomplete
 
 on: [push, repository_dispatch, workflow_dispatch]
 
