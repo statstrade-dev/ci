@@ -20,21 +20,21 @@ jobs:
       - name: Checkout foundation-base
         uses: actions/checkout@v3
         with:
-          repository: zcaudate/foundation-base
+          repository: zcaudate-xyz/foundation-base
           path: foundation-base
           token: ${{ secrets.GH_TOKEN }}
           
       - name: Checkout foundation-embed
         uses: actions/checkout@v3
         with:
-          repository: zcaudate/foundation-embed
+          repository: zcaudate-xyz/foundation-embed
           path: foundation-embed
           token: ${{ secrets.GH_TOKEN }}
           
       - name: Checkout foundation-fx
         uses: actions/checkout@v3
         with:
-          repository: zcaudate/foundation-fx
+          repository: zcaudate-xyz/foundation-fx
           path: foundation-fx
           token: ${{ secrets.GH_TOKEN }}
           
@@ -54,12 +54,12 @@ jobs:
           password: ${{ secrets.GH_TOKEN }}
 
       - name: Setup postgres
-        run: docker run -d --rm --network host --name postgres -e "POSTGRES_DB=test-scratch" -e "POSTGRES_PASSWORD=postgres" -e "POSTGRES_PORT=5432" -e "POSTGRES_USER=postgres" ghcr.io/zcaudate/infra-db:main
+        run: docker run -d --rm --network host --name postgres -e "POSTGRES_DB=test-scratch" -e "POSTGRES_PASSWORD=postgres" -e "POSTGRES_PORT=5432" -e "POSTGRES_USER=postgres" ghcr.io/zcaudate-xyz/infra-db:main
         
       - name: Run statsdb tests
         run: >
           docker run --rm --network host -v $(pwd):$(pwd) -w $(pwd) 
-          ghcr.io/zcaudate/foundation-ci:main 
+          ghcr.io/zcaudate-xyz/infra-foundation-ci:main 
           bash -c 'cd statstrade-core && make setup-checkouts && lein test-db'
 
   run-test-net:
@@ -71,21 +71,21 @@ jobs:
       - name: Checkout foundation-base
         uses: actions/checkout@v3
         with:
-          repository: zcaudate/foundation-base
+          repository: zcaudate-xyz/foundation-base
           path: foundation-base
           token: ${{ secrets.GH_TOKEN }}
           
       - name: Checkout foundation-embed
         uses: actions/checkout@v3
         with:
-          repository: zcaudate/foundation-embed
+          repository: zcaudate-xyz/foundation-embed
           path: foundation-embed
           token: ${{ secrets.GH_TOKEN }}
           
       - name: Checkout foundation-fx
         uses: actions/checkout@v3
         with:
-          repository: zcaudate/foundation-fx
+          repository: zcaudate-xyz/foundation-fx
           path: foundation-fx
           token: ${{ secrets.GH_TOKEN }}
           
@@ -105,12 +105,12 @@ jobs:
           password: ${{ secrets.GH_TOKEN }}
 
       - name: Setup postgres
-        run: docker run -d --rm --network host --name postgres -e "POSTGRES_DB=test-scratch" -e "POSTGRES_PASSWORD=postgres" -e "POSTGRES_PORT=5432" -e "POSTGRES_USER=postgres" ghcr.io/zcaudate/infra-db:main
+        run: docker run -d --rm --network host --name postgres -e "POSTGRES_DB=test-scratch" -e "POSTGRES_PASSWORD=postgres" -e "POSTGRES_PORT=5432" -e "POSTGRES_USER=postgres" ghcr.io/zcaudate-xyz/infra-db:main
         
       - name: Run statsnet tests
         run: >
           docker run --rm --network host -v $(pwd):$(pwd) -w $(pwd) 
-          ghcr.io/zcaudate/foundation-ci:main 
+          ghcr.io/zcaudate-xyz/infra-foundation-ci:main 
           bash -c 'cd statstrade-core && make setup-checkouts && lein test-net'
 
   run-test-link:
@@ -122,21 +122,21 @@ jobs:
       - name: Checkout foundation-base
         uses: actions/checkout@v3
         with:
-          repository: zcaudate/foundation-base
+          repository: zcaudate-xyz/foundation-base
           path: foundation-base
           token: ${{ secrets.GH_TOKEN }}
           
       - name: Checkout foundation-embed
         uses: actions/checkout@v3
         with:
-          repository: zcaudate/foundation-embed
+          repository: zcaudate-xyz/foundation-embed
           path: foundation-embed
           token: ${{ secrets.GH_TOKEN }}
           
       - name: Checkout foundation-fx
         uses: actions/checkout@v3
         with:
-          repository: zcaudate/foundation-fx
+          repository: zcaudate-xyz/foundation-fx
           path: foundation-fx
           token: ${{ secrets.GH_TOKEN }}
           
@@ -156,12 +156,12 @@ jobs:
           password: ${{ secrets.GH_TOKEN }}
 
       - name: Setup postgres
-        run: docker run -d --rm --network host --name postgres -e "POSTGRES_DB=test-scratch" -e "POSTGRES_PASSWORD=postgres" -e "POSTGRES_PORT=5432" -e "POSTGRES_USER=postgres" ghcr.io/zcaudate/infra-db:main
+        run: docker run -d --rm --network host --name postgres -e "POSTGRES_DB=test-scratch" -e "POSTGRES_PASSWORD=postgres" -e "POSTGRES_PORT=5432" -e "POSTGRES_USER=postgres" ghcr.io/zcaudate-xyz/infra-db:main
         
       - name: Run statslink tests
         run: >
           docker run --rm --network host -v $(pwd):$(pwd) -w $(pwd) 
-          ghcr.io/zcaudate/foundation-ci:main 
+          ghcr.io/zcaudate-xyz/infra-foundation-ci:main 
           bash -c 'cd statstrade-core && make setup-checkouts && lein test-link'
 
 #  run-test-iberia:
@@ -173,21 +173,21 @@ jobs:
 #      - name: Checkout foundation-base
 #        uses: actions/checkout@v3
 #        with:
-#          repository: zcaudate/foundation-base
+#          repository: zcaudate-xyz/foundation-base
 #          path: foundation-base
 #          token: ${{ secrets.GH_TOKEN }}
 #          
 #      - name: Checkout foundation-embed
 #        uses: actions/checkout@v3
 #        with:
-#          repository: zcaudate/foundation-embed
+#          repository: zcaudate-xyz/foundation-embed
 #          path: foundation-embed
 #          token: ${{ secrets.GH_TOKEN }}
 #          
 #      - name: Checkout foundation-fx
 #        uses: actions/checkout@v3
 #        with:
-#          repository: zcaudate/foundation-fx
+#          repository: zcaudate-xyz/foundation-fx
 #          path: foundation-fx
 #          token: ${{ secrets.GH_TOKEN }}
 #          
@@ -207,12 +207,12 @@ jobs:
 #          password: ${{ secrets.GH_TOKEN }}
 #
 #      - name: Setup postgres
-#        run: docker run -d --rm --network host --name postgres -e "POSTGRES_DB=test-scratch" -e "POSTGRES_PASSWORD=postgres" -e "POSTGRES_PORT=5432" -e "POSTGRES_USER=postgres" ghcr.io/zcaudate/infra-db:main
+#        run: docker run -d --rm --network host --name postgres -e "POSTGRES_DB=test-scratch" -e "POSTGRES_PASSWORD=postgres" -e "POSTGRES_PORT=5432" -e "POSTGRES_USER=postgres" ghcr.io/zcaudate-xyz/infra-db:main
 #        
 #      - name: Run iberia tests
 #        run: >
 #          docker run --rm --network host -v $(pwd):$(pwd) -w $(pwd) 
-#          ghcr.io/zcaudate/foundation-ci:main 
+#          ghcr.io/zcaudate-xyz/foundation-ci:main 
 #          bash -c 'cd statstrade-core && make setup-checkouts && lein test-iberia'
 
 #  run-test-pay:
@@ -224,21 +224,21 @@ jobs:
 #      - name: Checkout foundation-base
 #        uses: actions/checkout@v3
 #        with:
-#          repository: zcaudate/foundation-base
+#          repository: zcaudate-xyz/foundation-base
 #          path: foundation-base
 #          token: ${{ secrets.GH_TOKEN }}
 #          
 #      - name: Checkout foundation-embed
 #        uses: actions/checkout@v3
 #        with:
-#          repository: zcaudate/foundation-embed
+#          repository: zcaudate-xyz/foundation-embed
 #          path: foundation-embed
 #          token: ${{ secrets.GH_TOKEN }}
 #          
 #      - name: Checkout foundation-fx
 #        uses: actions/checkout@v3
 #        with:
-#          repository: zcaudate/foundation-fx
+#          repository: zcaudate-xyz/foundation-fx
 #          path: foundation-fx
 #          token: ${{ secrets.GH_TOKEN }}
 #          
@@ -258,11 +258,11 @@ jobs:
 #          password: ${{ secrets.GH_TOKEN }}
 #
 #      - name: Setup postgres
-#        run: docker run -d --rm --network host --name postgres -e "POSTGRES_DB=test-scratch" -e "POSTGRES_PASSWORD=postgres" -e "POSTGRES_PORT=5432" -e "POSTGRES_USER=postgres" ghcr.io/zcaudate/infra-db:main
+#        run: docker run -d --rm --network host --name postgres -e "POSTGRES_DB=test-scratch" -e "POSTGRES_PASSWORD=postgres" -e "POSTGRES_PORT=5432" -e "POSTGRES_USER=postgres" ghcr.io/zcaudate-xyz/infra-db:main
 #        
 #      - name: Run statspay tests
 #        run: >
 #          docker run --rm --network host -v $(pwd):$(pwd) -w $(pwd) 
-#          ghcr.io/zcaudate/foundation-ci:main 
+#          ghcr.io/zcaudate-xyz/foundation-ci:main 
 #          bash -c 'cd statstrade-core && make setup-checkouts && lein test-pay'
 #
