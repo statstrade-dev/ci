@@ -1,4 +1,4 @@
-name: Build
+name: Check Imcomplete
 
 on: [push, repository_dispatch, workflow_dispatch]
 
