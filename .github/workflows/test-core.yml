@@ -14,15 +14,6 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 12
 
-    services:
-      docker:
-        image: docker:dind
-        options: --privileged --shm-size=2g
-        ports:
-          - 2375:2375
-        volumes:
-          - /var/run/docker.sock:/var/run/docker.sock:ro
-
     steps:
           
       - name: Checkout foundation-base
@@ -66,7 +57,8 @@ jobs:
         
       - name: Run statsdb tests
         run: >
-          docker run --rm --network host -v $(pwd):$(pwd) -w $(pwd) 
+          docker run --rm --network host -v $(pwd):$(pwd) -w $(pwd)
+          -v /var/run/docker.sock:/var/run/docker.sock:ro
           ghcr.io/zcaudate-xyz/infra-foundation-dev:ci 
           bash -c 'cd statstrade-core && make setup-checkouts && lein test-db'
 
@@ -126,6 +118,7 @@ jobs:
       - name: Run statsnet tests
         run: >
           docker run --rm --network host -v $(pwd):$(pwd) -w $(pwd) 
+          -v /var/run/docker.sock:/var/run/docker.sock:ro
           ghcr.io/zcaudate-xyz/infra-foundation-dev:ci 
           bash -c 'cd statstrade-core && make setup-checkouts && lein test-net'
 
@@ -185,6 +178,7 @@ jobs:
       - name: Run statslink tests
         run: >
           docker run --rm --network host -v $(pwd):$(pwd) -w $(pwd) 
+          -v /var/run/docker.sock:/var/run/docker.sock:ro
           ghcr.io/zcaudate-xyz/infra-foundation-dev:ci 
           bash -c 'cd statstrade-core && make setup-checkouts && lein test-link'
 
