@@ -74,7 +74,7 @@ jobs:
           -v $(pwd):$(pwd) -w $(pwd) 
           -e "GITHUB_TOKEN=${{ secrets.GH_TOKEN }}"  
           -e "GITHUB_USER=${{ secrets.GH_USER }}"
-          ghcr.io/zcaudate-xyz/infra-foundation-test:main 
+          ghcr.io/zcaudate-xyz/infra-foundation-dev:ci 
           bash -c "cd statstrade-core && make setup-checkouts && git config --global --add safe.directory '*' && lein push-core-code"
 
       - name: Deploying statstrade-edge
@@ -85,7 +85,7 @@ jobs:
           -v $(pwd):$(pwd) -w $(pwd)
           -e "GITHUB_TOKEN=${{ secrets.GH_TOKEN }}"  
           -e "GITHUB_USER=${{ secrets.GH_USER }}"
-          ghcr.io/zcaudate-xyz/infra-foundation-test:main 
+          ghcr.io/zcaudate-xyz/infra-foundation-dev:ci
           bash -c "cd statstrade-edge && make setup-checkouts && git config --global --add safe.directory '*' && lein push-edge-code"
           
   push-containers:
@@ -158,7 +158,7 @@ jobs:
           -w $(pwd)
           -e "GITHUB_TOKEN=${{ secrets.GH_TOKEN }}"
           -e "GITHUB_USER=${{ secrets.GH_USER }}"
-          ghcr.io/zcaudate-xyz/infra-foundation-test:main
+          ghcr.io/zcaudate-xyz/infra-foundation-dev:ci
           bash -c "docker login -p ${{ secrets.GH_TOKEN }} -u ${{ secrets.GH_USER }} ghcr.io
           && git config --global --add safe.directory '*'
           && cd statstrade-edge && make setup-checkouts && lein push-edge-image"
