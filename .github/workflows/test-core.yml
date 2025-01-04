@@ -18,6 +18,8 @@ jobs:
       docker:
         image: docker:dind
         options: --privileged --shm-size=2g
+        ports:
+          - 2375:2375
         volumes:
           - /var/run/docker.sock:/var/run/docker.sock:ro
 
@@ -76,6 +78,8 @@ jobs:
       docker:
         image: docker:dind
         options: --privileged --shm-size=2g
+        ports:
+          - 2375:2375
         volumes:
           - /var/run/docker.sock:/var/run/docker.sock:ro
 
@@ -133,6 +137,8 @@ jobs:
       docker:
         image: docker:dind
         options: --privileged --shm-size=2g
+        ports:
+          - 2375:2375
         volumes:
           - /var/run/docker.sock:/var/run/docker.sock:ro
 
