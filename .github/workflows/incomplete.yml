@@ -28,7 +28,7 @@ jobs:
           -v /var/run/docker.sock:/var/run/docker.sock 
           -v $(pwd):$(pwd) 
           -w $(pwd) 
-          ghcr.io/zcaudate-xyz/infra-foundation-test:main lein incomplete
+          ghcr.io/zcaudate-xyz/infra-foundation-dev:ci lein incomplete
 
 
   incomplete-edge:
@@ -55,4 +55,4 @@ jobs:
           -v /var/run/docker.sock:/var/run/docker.sock 
           -v $(pwd):$(pwd) 
           -w $(pwd) 
-          ghcr.io/zcaudate-xyz/infra-foundation-test:main lein incomplete
+          ghcr.io/zcaudate-xyz/infra-foundation-dev:ci lein incomplete
