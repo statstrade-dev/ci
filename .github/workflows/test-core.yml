@@ -5,7 +5,6 @@ on:
   repository_dispatch:
     types: [core-changed, all]
   workflow_dispatch:
-    types: [core-changed, all]
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -58,7 +57,8 @@ jobs:
         
       - name: Run statsdb tests
         run: >
-          docker run --rm --network host -v $(pwd):$(pwd) -w $(pwd) 
+          docker run --rm --network host -v $(pwd):$(pwd) -w $(pwd)
+          -v /var/run/docker.sock:/var/run/docker.sock:ro
           ghcr.io/zcaudate-xyz/infra-foundation-dev:ci 
           bash -c 'cd statstrade-core && make setup-checkouts && lein test-db'
 
@@ -66,6 +66,14 @@ jobs:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    services:
+      docker:
+        image: docker:dind
+        options: --privileged --shm-size=2g
+        ports:
+          - 2375:2375
+        volumes:
+          - /var/run/docker.sock:/var/run/docker.sock:ro
 
     steps:
       - name: Checkout foundation-base
@@ -110,6 +118,7 @@ jobs:
       - name: Run statsnet tests
         run: >
           docker run --rm --network host -v $(pwd):$(pwd) -w $(pwd) 
+          -v /var/run/docker.sock:/var/run/docker.sock:ro
           ghcr.io/zcaudate-xyz/infra-foundation-dev:ci
           bash -c 'cd statstrade-core && make setup-checkouts && lein test-net'
 
@@ -117,6 +126,14 @@ jobs:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    services:
+      docker:
+        image: docker:dind
+        options: --privileged --shm-size=2g
+        ports:
+          - 2375:2375
+        volumes:
+          - /var/run/docker.sock:/var/run/docker.sock:ro
 
     steps:
       - name: Checkout foundation-base
@@ -161,5 +178,6 @@ jobs:
       - name: Run statslink tests
         run: >
           docker run --rm --network host -v $(pwd):$(pwd) -w $(pwd) 
+          -v /var/run/docker.sock:/var/run/docker.sock:ro
           ghcr.io/zcaudate-xyz/infra-foundation-dev:ci 
           bash -c 'cd statstrade-core && make setup-checkouts && lein test-link'

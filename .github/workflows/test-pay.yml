@@ -57,5 +57,6 @@ jobs:
       - name: Run statslink tests
         run: >
           docker run --rm --network host -v $(pwd):$(pwd) -w $(pwd) 
+          -v /var/run/docker.sock:/var/run/docker.sock:ro
           ghcr.io/zcaudate-xyz/infra-foundation-dev:ci 
           bash -c 'cd statstrade-core && make setup-checkouts && lein test-pay'
