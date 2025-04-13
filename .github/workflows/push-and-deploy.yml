@@ -57,14 +57,7 @@ jobs:
           repository: statstrade-dev/statstrade-core
           path: statstrade-core
           token: ${{ secrets.GH_TOKEN }}
-          
-      - name: Checkout statstrade-edge
-        uses: actions/checkout@v3
-        with:
-          repository: statstrade-dev/statstrade-edge
-          path: statstrade-edge
-          token: ${{ secrets.GH_TOKEN }}
-
+          submodules: recursive
                     
       - name: Deploying statstrade-core
         run: >
@@ -75,7 +68,7 @@ jobs:
           -e "GITHUB_TOKEN=${{ secrets.GH_TOKEN }}"  
           -e "GITHUB_USER=${{ secrets.GH_USER }}"
           ghcr.io/zcaudate-xyz/infra-foundation-dev:ci 
-          bash -c "cd statstrade-core && make setup-checkouts && git config --global --add safe.directory '*' && lein push-core-code"
+          bash -c "cd statstrade-core && make deps-checkouts && git config --global --add safe.directory '*' && lein push-core-code"
 
       - name: Deploying statstrade-edge
         run: >
@@ -86,7 +79,7 @@ jobs:
           -e "GITHUB_TOKEN=${{ secrets.GH_TOKEN }}"  
           -e "GITHUB_USER=${{ secrets.GH_USER }}"
           ghcr.io/zcaudate-xyz/infra-foundation-dev:ci
-          bash -c "cd statstrade-edge && make setup-checkouts && git config --global --add safe.directory '*' && lein push-edge-code"
+          bash -c "cd statstrade-core && make deps-checkouts && git config --global --add safe.directory '*' && lein push-edge-code"
           
   push-containers:
     runs-on: ubuntu-latest
@@ -141,13 +134,7 @@ jobs:
           repository: statstrade-dev/statstrade-core
           path: statstrade-core
           token: ${{ secrets.GH_TOKEN }}
-          
-      - name: Checkout statstrade-edge
-        uses: actions/checkout@v3
-        with:
-          repository: statstrade-dev/statstrade-edge
-          path: statstrade-edge
-          token: ${{ secrets.GH_TOKEN }}
+          submodules: recursive
 
       - name: Push Containers
         run: >
@@ -161,7 +148,7 @@ jobs:
           ghcr.io/zcaudate-xyz/infra-foundation-dev:ci
           bash -c "docker login -p ${{ secrets.GH_TOKEN }} -u ${{ secrets.GH_USER }} ghcr.io
           && git config --global --add safe.directory '*'
-          && cd statstrade-edge && make setup-checkouts && lein push-edge-image"
+          && cd statstrade-core && make deps-checkouts && lein push-edge-image"
     
       - name: Notify Deploy
         uses: peter-evans/repository-dispatch@v2

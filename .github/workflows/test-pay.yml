@@ -42,6 +42,7 @@ jobs:
           repository: statstrade-dev/statstrade-core
           path: statstrade-core
           token: ${{ secrets.GH_TOKEN }}
+          submodules: recursive
           
       - name: Log into registry ${{ env.REGISTRY }}
         if: github.event_name != 'pull_request'
@@ -59,4 +60,4 @@ jobs:
           docker run --rm --network host -v $(pwd):$(pwd) -w $(pwd) 
           -v /var/run/docker.sock:/var/run/docker.sock:ro
           ghcr.io/zcaudate-xyz/infra-foundation-dev:ci 
-          bash -c 'cd statstrade-core && make setup-checkouts && lein test-pay'
+          bash -c 'cd statstrade-core && make deps-checkouts && lein test-pay'
