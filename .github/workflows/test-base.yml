@@ -43,6 +43,7 @@ jobs:
           repository: statstrade-dev/statstrade-core
           path: statstrade-core
           token: ${{ secrets.GH_TOKEN }}
+          submodules: recursive
           
       - name: Log into registry ${{ env.REGISTRY }}
         if: github.event_name != 'pull_request'
@@ -111,6 +112,7 @@ jobs:
           registry: ghcr.io
           username: ${{ secrets.GH_USER }}
           password: ${{ secrets.GH_TOKEN }}
+          submodules: recursive
 
       # - name: Setup postgres
       #   run: docker run -d --rm --network host --name postgres -e "POSTGRES_DB=test-scratch" -e "POSTGRES_PASSWORD=postgres" -e "POSTGRES_PORT=5432" -e "POSTGRES_USER=postgres" ghcr.io/zcaudate-xyz/infra-db:main
@@ -163,6 +165,7 @@ jobs:
           repository: statstrade-dev/statstrade-core
           path: statstrade-core
           token: ${{ secrets.GH_TOKEN }}
+          submodules: recursive
           
       - name: Log into registry ${{ env.REGISTRY }}
         if: github.event_name != 'pull_request'
