@@ -35,6 +35,13 @@ jobs:
           path: foundation-fx
           token: ${{ secrets.GH_TOKEN }}
           
+      - name: Checkout foundation-web
+        uses: actions/checkout@v3
+        with:
+          repository: zcaudate-xyz/foundation-web
+          path: foundation-fx
+          token: ${{ secrets.GH_TOKEN }}
+          
       - name: Checkout statstrade-core
         uses: actions/checkout@v3
         with:
@@ -58,7 +65,7 @@ jobs:
         run: >
           docker run --rm --network host -v $(pwd):$(pwd) -w $(pwd) 
           ghcr.io/zcaudate-xyz/infra-foundation-dev:ci 
-          bash -c 'cd statstrade-core && make setup-checkouts && lein test-iberia'
+          bash -c 'cd statstrade-core && make deps-checkouts && lein test-iberia'
 
   run-test-statsweb:
     # The type of runner that the job will run on
@@ -87,56 +94,10 @@ jobs:
           path: foundation-fx
           token: ${{ secrets.GH_TOKEN }}
           
-      - name: Checkout statstrade-core
+      - name: Checkout foundation-web
         uses: actions/checkout@v3
         with:
-          repository: statstrade-dev/statstrade-core
-          path: statstrade-core
-          token: ${{ secrets.GH_TOKEN }}
-          submodules: recursive
-          
-      - name: Log into registry ${{ env.REGISTRY }}
-        if: github.event_name != 'pull_request'
-        uses: docker/login-action@v2
-        with:
-          registry: ghcr.io
-          username: ${{ secrets.GH_USER }}
-          password: ${{ secrets.GH_TOKEN }}
-
-      # - name: Setup postgres
-      #   run: docker run -d --rm --network host --name postgres -e "POSTGRES_DB=test-scratch" -e "POSTGRES_PASSWORD=postgres" -e "POSTGRES_PORT=5432" -e "POSTGRES_USER=postgres" ghcr.io/zcaudate-xyz/infra-db:main
-        
-      - name: Run iberia tests
-        run: >
-          docker run --rm --network host -v $(pwd):$(pwd) -w $(pwd) 
-          ghcr.io/zcaudate-xyz/infra-foundation-dev:ci 
-          bash -c 'cd statstrade-core && make setup-checkouts && lein test-statsweb'
-
-
-  run-local:
-    # The type of runner that the job will run on
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-
-    steps: 
-      - name: Checkout foundation-base
-        uses: actions/checkout@v3
-        with:
-          repository: zcaudate-xyz/foundation-base
-          path: foundation-base
-          token: ${{ secrets.GH_TOKEN }}
-          
-      - name: Checkout foundation-embed
-        uses: actions/checkout@v3
-        with:
-          repository: zcaudate-xyz/foundation-embed
-          path: foundation-embed
-          token: ${{ secrets.GH_TOKEN }}
-          
-      - name: Checkout foundation-fx
-        uses: actions/checkout@v3
-        with:
-          repository: zcaudate-xyz/foundation-fx
+          repository: zcaudate-xyz/foundation-web
           path: foundation-fx
           token: ${{ secrets.GH_TOKEN }}
           
@@ -159,8 +120,8 @@ jobs:
       # - name: Setup postgres
       #   run: docker run -d --rm --network host --name postgres -e "POSTGRES_DB=test-scratch" -e "POSTGRES_PASSWORD=postgres" -e "POSTGRES_PORT=5432" -e "POSTGRES_USER=postgres" ghcr.io/zcaudate-xyz/infra-db:main
         
-      - name: Run statsedge tests
+      - name: Run statsweb tests
         run: >
           docker run --rm --network host -v $(pwd):$(pwd) -w $(pwd) 
           ghcr.io/zcaudate-xyz/infra-foundation-dev:ci 
-          bash -c 'cd statstrade-edge && make setup-checkouts && lein test'
+          bash -c 'cd statstrade-core && make deps-checkouts && lein test-statsweb'
