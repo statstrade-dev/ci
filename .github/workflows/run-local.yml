@@ -62,4 +62,4 @@ jobs:
         run: >
           docker run --rm --network host -v $(pwd):$(pwd) -w $(pwd) 
           ghcr.io/zcaudate-xyz/infra-foundation-dev:ci 
-          bash -c 'cd statstrade-edge && make deps-checkouts && lein run-local'
+          bash -c 'cd statstrade-core && make deps-checkouts && lein run-local'
