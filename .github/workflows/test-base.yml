@@ -60,7 +60,7 @@ jobs:
           docker run --rm --network host -v $(pwd):$(pwd) -w $(pwd)
           -v /var/run/docker.sock:/var/run/docker.sock:ro
           ghcr.io/zcaudate-xyz/infra-foundation-dev:ci 
-          bash -c 'cd statstrade-core && make setup-checkouts && lein test-db'
+          bash -c 'cd statstrade-core && make deps-checkouts && lein test-db'
 
   run-test-net:
     # The type of runner that the job will run on
@@ -120,7 +120,7 @@ jobs:
           docker run --rm --network host -v $(pwd):$(pwd) -w $(pwd) 
           -v /var/run/docker.sock:/var/run/docker.sock:ro
           ghcr.io/zcaudate-xyz/infra-foundation-dev:ci
-          bash -c 'cd statstrade-core && make setup-checkouts && lein test-net'
+          bash -c 'cd statstrade-core && make deps-checkouts && lein test-net'
 
   run-test-link:
     # The type of runner that the job will run on
@@ -180,4 +180,4 @@ jobs:
           docker run --rm --network host -v $(pwd):$(pwd) -w $(pwd) 
           -v /var/run/docker.sock:/var/run/docker.sock:ro
           ghcr.io/zcaudate-xyz/infra-foundation-dev:ci 
-          bash -c 'cd statstrade-core && make setup-checkouts && lein test-link'
+          bash -c 'cd statstrade-core && make deps-checkouts && lein test-link'
