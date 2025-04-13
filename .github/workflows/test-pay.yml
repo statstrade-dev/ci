@@ -51,10 +51,10 @@ jobs:
           username: ${{ secrets.GH_USER }}
           password: ${{ secrets.GH_TOKEN }}
 
-      - name: Setup postgres
-        run: docker run -d --rm --network host --name postgres -e "POSTGRES_DB=test-scratch" -e "POSTGRES_PASSWORD=postgres" -e "POSTGRES_PORT=5432" -e "POSTGRES_USER=postgres" ghcr.io/zcaudate-xyz/infra-db:main
+      # - name: Setup postgres
+      #   run: docker run -d --rm --network host --name postgres -e "POSTGRES_DB=test-scratch" -e "POSTGRES_PASSWORD=postgres" -e "POSTGRES_PORT=5432" -e "POSTGRES_USER=postgres" ghcr.io/zcaudate-xyz/infra-db:main
         
-      - name: Run statslink tests
+      - name: Run statspay tests
         run: >
           docker run --rm --network host -v $(pwd):$(pwd) -w $(pwd) 
           -v /var/run/docker.sock:/var/run/docker.sock:ro
