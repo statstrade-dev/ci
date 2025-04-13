@@ -60,9 +60,9 @@ jobs:
 
       - name: Run Tmux
         run: >
-          docker run --rm --network host -v $(pwd):$(pwd) -w $(pwd) 
+          docker run --rm 
           ghcr.io/zcaudate-xyz/infra-foundation-dev:ci 
-          bash -c 'tmux list-sessions'
+          which tmux
         
       - name: Run Build
         run: >
