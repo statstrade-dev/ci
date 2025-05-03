@@ -69,18 +69,7 @@ jobs:
           -e "GITHUB_USER=${{ secrets.GH_USER }}"
           ghcr.io/zcaudate-xyz/infra-foundation-dev:ci 
           bash -c "cd statstrade-core && make deps-checkouts && git config --global --add safe.directory '*' && lein push-core-code"
-
-      - name: Deploying statstrade-edge
-        run: >
-          docker run --network host
-          -v /var/run/docker.sock:/var/run/docker.sock
-          -v $HOME/.ssh:/root/.ssh
-          -v $(pwd):$(pwd) -w $(pwd)
-          -e "GITHUB_TOKEN=${{ secrets.GH_TOKEN }}"  
-          -e "GITHUB_USER=${{ secrets.GH_USER }}"
-          ghcr.io/zcaudate-xyz/infra-foundation-dev:ci
-          bash -c "cd statstrade-core && make deps-checkouts && git config --global --add safe.directory '*' && lein push-edge-code"
-          
+     
   push-containers:
     runs-on: ubuntu-latest
 
