@@ -30,13 +30,6 @@ jobs:
           path: foundation-embed
           token: ${{ secrets.GH_TOKEN }}
           
-      - name: Checkout foundation-fx
-        uses: actions/checkout@v3
-        with:
-          repository: zcaudate-xyz/foundation-fx
-          path: foundation-fx
-          token: ${{ secrets.GH_TOKEN }}
-          
       - name: Checkout statstrade-core
         uses: actions/checkout@v3
         with:
@@ -62,6 +55,53 @@ jobs:
           -v /var/run/docker.sock:/var/run/docker.sock:ro
           ghcr.io/zcaudate-xyz/infra-foundation-dev:ci 
           bash -c 'cd statstrade-core && make deps-checkouts && lein test-db'
+
+  run-test-api:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+
+    steps:
+          
+      - name: Checkout foundation-base
+        uses: actions/checkout@v3
+        with:
+          repository: zcaudate-xyz/foundation-base
+          path: foundation-base
+          token: ${{ secrets.GH_TOKEN }}
+          
+      - name: Checkout foundation-embed
+        uses: actions/checkout@v3
+        with:
+          repository: zcaudate-xyz/foundation-embed
+          path: foundation-embed
+          token: ${{ secrets.GH_TOKEN }}
+          
+      - name: Checkout statstrade-core
+        uses: actions/checkout@v3
+        with:
+          repository: statstrade-dev/statstrade-core
+          path: statstrade-core
+          token: ${{ secrets.GH_TOKEN }}
+          submodules: recursive
+          
+      - name: Log into registry ${{ env.REGISTRY }}
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ secrets.GH_USER }}
+          password: ${{ secrets.GH_TOKEN }}
+
+      # - name: Setup postgres
+      #   run: docker run -d --rm --network host --name postgres -e "POSTGRES_DB=test-scratch" -e "POSTGRES_PASSWORD=postgres" -e "POSTGRES_PORT=5432" -e "POSTGRES_USER=postgres" ghcr.io/zcaudate-xyz/infra-db:main
+        
+      - name: Run statsapi tests
+        run: >
+          docker run --rm --network host -v $(pwd):$(pwd) -w $(pwd)
+          -v /var/run/docker.sock:/var/run/docker.sock:ro
+          ghcr.io/zcaudate-xyz/infra-foundation-dev:ci 
+          bash -c 'cd statstrade-core && make deps-checkouts && lein test-api'
 
   run-test-net:
     # The type of runner that the job will run on
