@@ -43,3 +43,4 @@ jobs:
           publish_branch: main
           publish_dir: ./apps/storybook/storybook-static
           user_name: ${{ secrets.GH_USER }}
+          user_name: ${{ secrets.GH_USER_EMAIL }}
