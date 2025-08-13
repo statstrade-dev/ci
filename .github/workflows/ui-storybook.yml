@@ -8,7 +8,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-and-deploy:
+    
+  publish-storybook:
     runs-on: ubuntu-latest
 
     steps:
@@ -37,7 +38,7 @@ jobs:
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
-          deploy_key: ${{ secrets.GH_TOKEN }} # or token
+          deploy_key: ${{ secrets.GH_PRIVATE_COMMIT_KEY }} # or token
           external_repository: statstrade-dev/statstrade-ui.storybook
           publish_branch: main
           publish_dir: ./apps/storybook/storybook-static
