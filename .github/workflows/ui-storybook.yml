@@ -40,5 +40,5 @@ jobs:
           deploy_key: ${{ secrets.GH_TOKEN }} # or token
           external_repository: statstrade-dev/statstrade-ui.storybook
           publish_branch: main
-          publish_dir: ./storybook-static
+          publish_dir: ./apps/storybook/storybook-static
           user_name: ${{ secrets.GH_USER }}
