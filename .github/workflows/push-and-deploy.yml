@@ -1,6 +1,10 @@
 name: Push and Deploy
 
-on: [push, repository_dispatch, workflow_dispatch]
+# Controls when the workflow will run
+on:
+  repository_dispatch:
+    types: [core-changed]
+  workflow_dispatch:
 
 jobs:
   

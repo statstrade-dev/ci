@@ -3,7 +3,7 @@ name: Run Core Tests
 # Controls when the workflow will run
 on:
   repository_dispatch:
-    types: [core-changed, all]
+    types: [core-changed, edge-changed]
   workflow_dispatch:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel

@@ -1,7 +1,10 @@
 name: Check Incomplete
 
-on: [push, repository_dispatch, workflow_dispatch]
-
+on:
+  repository_dispatch:
+    types: [core-changed, edge-changed]
+  workflow_dispatch:
+      
 jobs:
 
   incomplete-core:

@@ -3,9 +3,8 @@ name: Run Pay Tests
 # Controls when the workflow will run
 on:
   repository_dispatch:
-    types: [core-changed, all]
+    types: [core-changed]
   workflow_dispatch:
-    types: [core-changed, all]
 
 jobs:
     
