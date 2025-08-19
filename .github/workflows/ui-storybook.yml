@@ -39,7 +39,7 @@ jobs:
         uses: peaceiris/actions-gh-pages@v4
         with:
           deploy_key: ${{ secrets.GH_PRIVATE_COMMIT_KEY }} # or token
-          external_repository: statstrade-dev/statstrade-ui.storybook
+          external_repository: statstrade-deploy/statstrade-ui.storybook
           publish_branch: main
           publish_dir: ./apps/storybook/storybook-static
           user_name: ${{ secrets.GH_USER }}
