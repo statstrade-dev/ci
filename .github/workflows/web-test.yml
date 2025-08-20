@@ -35,6 +35,16 @@ jobs:
         run: |
           # Write the content of the secret into .env.local
           printf '%s\n' "$ENV_LOCAL" > .env.local
+          
+      - name: Create vercel.json
+        run: |
+          cat > vercel.json <<'EOF'
+          {
+            "functions": {},
+            "buildCommand": null,
+            "outputDirectory": "."
+          }
+          EOF
 
       # 3. Build Web Test
       - name: Build Web Test
