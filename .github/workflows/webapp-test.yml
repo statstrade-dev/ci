@@ -28,12 +28,19 @@ jobs:
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
+        
+      - name: Create .env.local from secret
+        env:
+          ENV_LOCAL: ${{ secrets.WEBAPP_ENV_TEST }}
+        run: |
+          # Write the content of the secret into .env.local
+          printf '%s\n' "$ENV_LOCAL" > .env.local
 
-      # 3. Build Storybook
-      - name: Build Storybook
+      # 3. Build Webapp Test
+      - name: Build Webapp Test
         run: yarn web:prod
 
-      # 4. Publish to statstrade-ui.storybook
+      # 4. Publish to statstrade-deploy/webapp-test
       - name: Deploy to GitHub Repo
         uses: peaceiris/actions-gh-pages@v4
         with:
