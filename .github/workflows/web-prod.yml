@@ -1,14 +1,14 @@
-name: Publish Webapp Test
+name: Publish Web Prod
 
 # Controls when the workflow will run
 on:
   repository_dispatch:
-    types: [ui-changed]
+    types: [ui-changed-prod]
   workflow_dispatch:
 
 jobs:
     
-  publish-storybook:
+  publish-web-prod:
     runs-on: ubuntu-latest
 
     steps:
@@ -18,6 +18,7 @@ jobs:
         with:
           repository: statstrade-dev/statstrade-monorepo
           token: ${{ secrets.GH_TOKEN }} # Personal Access Token with repo write access
+          branch: prod
 
       # 2. Install Node and Yarn
       - name: Set up Node.js
@@ -31,21 +32,21 @@ jobs:
         
       - name: Create .env.local from secret
         env:
-          ENV_LOCAL: ${{ secrets.WEBAPP_ENV_TEST }}
+          ENV_LOCAL: ${{ secrets.WEBAPP_ENV_PROD }}
         run: |
           # Write the content of the secret into .env.local
           printf '%s\n' "$ENV_LOCAL" > .env.local
 
-      # 3. Build Webapp Test
-      - name: Build Webapp Test
+      # 3. Build Web Prod
+      - name: Build Web Prod
         run: yarn web:prod
 
-      # 4. Publish to statstrade-deploy/webapp-test
+      # 4. Publish to statstrade-deploy/webapp-prod
       - name: Deploy to GitHub Repo
         uses: peaceiris/actions-gh-pages@v4
         with:
           deploy_key: ${{ secrets.GH_PRIVATE_COMMIT_KEY }} # or token
-          external_repository: statstrade-deploy/webapp-test
+          external_repository: statstrade-deploy/webapp-prod
           publish_branch: main
           publish_dir: ./apps/next/.next
           user_name: ${{ secrets.GH_USER }}
