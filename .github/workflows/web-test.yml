@@ -1,9 +1,13 @@
 name: Publish Web Test
 
+env:
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_WEB_TEST_ID }}
+
 # Controls when the workflow will run
 on:
   repository_dispatch:
-    types: [ui-changed-test]
+    types: [ui-changed]
   workflow_dispatch:
 
 jobs:
@@ -35,18 +39,10 @@ jobs:
         run: |
           # Write the content of the secret into .env.local
           printf '%s\n' "$ENV_LOCAL" > .env.local
-          
-      # 3. Build Web Test
+        
+      - name: Pull Vercel Environment
+        run: yarn workspace next-app vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
       - name: Build Web Test
-        run: yarn web:prod
-
-      # 4. Publish to statstrade-deploy/webapp-test
-      - name: Deploy to GitHub Repo
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          deploy_key: ${{ secrets.GH_PRIVATE_COMMIT_KEY }} # or token
-          external_repository: statstrade-deploy/webapp-test
-          publish_branch: main
-          publish_dir: ./apps/next/.next
-          user_name: ${{ secrets.GH_USER }}
-          user_email: ${{ secrets.GH_USER_EMAIL }}
+        run: yarn workspace next-app vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+      - name: Deploy Web Test
+        run: yarn workspace next-app vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
