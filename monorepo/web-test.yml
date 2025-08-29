@@ -1,8 +1,8 @@
-name: Publish Web Prod
+name: Publish Web Test
 
 env:
   VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_WEB_PROD_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_WEB_TEST_ID }}
 
 # Controls when the workflow will run
 on:
@@ -20,8 +20,7 @@ jobs:
       - name: Checkout monorepo
         uses: actions/checkout@v4
         with:
-          repository: statstrade-dev/statstrade-lite
-          branch: prod
+          repository: statstrade-dev/statstrade-monorepo
           token: ${{ secrets.GH_TOKEN }} # Personal Access Token with repo write access
 
       # 2. Install Node and Yarn
@@ -36,14 +35,14 @@ jobs:
         
       - name: Create .env.local from secret
         env:
-          ENV_LOCAL: ${{ secrets.WEBAPP_ENV_PROD }}
+          ENV_LOCAL: ${{ secrets.WEBAPP_ENV_TEST }}
         run: |
           # Write the content of the secret into .env.local
           printf '%s\n' "$ENV_LOCAL" > .env.local
         
       - name: Pull Vercel Environment
-        run: yarn workspace web vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+        run: yarn workspace next-app vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
       - name: Build Web Test
-        run: yarn workspace web vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+        run: yarn workspace next-app vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
       - name: Deploy Web Test
-        run: yarn workspace web vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
+        run: yarn workspace next-app vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
