@@ -7,7 +7,7 @@ env:
 # Controls when the workflow will run
 on:
   repository_dispatch:
-    types: [ui-changed]
+    types: [ui-changed-prod]
   workflow_dispatch:
 
 jobs:
@@ -16,8 +16,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Check out monorepo
-      - name: Checkout monorepo
+      # 1. Check out lite
+      - name: Checkout lite
         uses: actions/checkout@v4
         with:
           repository: statstrade-dev/statstrade-lite

@@ -1,4 +1,4 @@
-name: Publish Web Test
+name: Publish Web Main
 
 env:
   VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
@@ -12,12 +12,12 @@ on:
 
 jobs:
     
-  publish-web-test:
+  publish-web-main:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Check out monorepo
-      - name: Checkout monorepo
+      # 1. Check out lite
+      - name: Checkout lite
         uses: actions/checkout@v4
         with:
           repository: statstrade-dev/statstrade-lite
