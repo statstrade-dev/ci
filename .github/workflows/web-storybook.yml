@@ -1,6 +1,5 @@
 name: Publish Storybook
 
-
 # Controls when the workflow will run
 on:
   repository_dispatch:
@@ -10,14 +9,15 @@ on:
 jobs:
     
   publish-storybook:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-laprod
 
     steps:
-      # 1. Check out monorepo
-      - name: Checkout monorepo
+      # 1. Check out lite
+      - name: Checkout lite
         uses: actions/checkout@v4
         with:
-          repository: statstrade-dev/statstrade-monorepo
+          repository: statstrade-dev/statstrade-lite
+          branch: prod
           token: ${{ secrets.GH_TOKEN }} # Personal Access Token with repo write access
 
       # 2. Install Node and Yarn
@@ -29,18 +29,9 @@ jobs:
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
-
-      # 3. Build Storybook
+        
       - name: Build Storybook
-        run: yarn storybook:build
+        run: yarn workspace @statstrade/storybook build:storybook
 
-      # 4. Publish to statstrade-ui.storybook
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          deploy_key: ${{ secrets.GH_PRIVATE_COMMIT_KEY }} # or token
-          external_repository: statstrade-deploy/statstrade-ui.storybook
-          publish_branch: main
-          publish_dir: ./apps/storybook/storybook-static
-          user_name: ${{ secrets.GH_USER }}
-          user_email: ${{ secrets.GH_USER_EMAIL }}
+      - name: Deploy Storybook to Netlify
+        run: yarn netlify deploy --filter @statstrade/ui.storybook --dir=projects/storybook/dist --no-build --prod --auth=${{ secrets.NETLIFY_TOKEN }} --site=${{ secrets.NETLIFY_STORYBOOK_ID }}

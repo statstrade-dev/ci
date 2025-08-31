@@ -84,6 +84,6 @@ jobs:
         run: yarn workspace @statstrade/web next build
 
       - name: Deploy Web Prod to Netlify
-        run: yarn workspace @statstrade/web netlify deploy --dir=projects/web/out --no-build --prod --auth=${{ secrets.NETLIFY_TOKEN }} --site=${{ secrets.NETLIFY_WEB_PROD_ID }}
+        run: yarn netlify deploy --filter @statstrade/web --dir=projects/web/out --no-build --prod --auth=${{ secrets.NETLIFY_TOKEN }} --site=${{ secrets.NETLIFY_WEB_PROD_ID }}
         
 
