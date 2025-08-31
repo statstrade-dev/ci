@@ -53,7 +53,7 @@ jobs:
       - name: Deploy Web Main to Netlify
         uses: nwtgck/actions-netlify@v2.0
         with:
-          publish-dir: ./out
+          publish-dir: ./statstrade-lite/projects/web/.next
           production-deploy: true
           github-token: ${{ secrets.GITHUB_TOKEN }}
           deploy-message: "Deploy Web Main to Netlify"
