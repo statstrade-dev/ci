@@ -12,8 +12,8 @@ on:
 
 jobs:
     
-  publish-web-test:
-    runs-on: ubuntu-latest
+  publish-web-prod:
+    runs-on: ubuntu-laprod
 
     steps:
       # 1. Check out lite
@@ -43,7 +43,20 @@ jobs:
         
       - name: Pull Vercel Environment
         run: yarn workspace @statstrade/web vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
-      - name: Build Web Test
+        
+      - name: Build Web Prod
         run: yarn workspace @statstrade/web vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
-      - name: Deploy Web Test
+      
+      - name: Deploy Web Prod
         run: yarn workspace @statstrade/web vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Deploy Web Prod to Netlify
+        uses: nwtgck/actions-netlify@v2.0
+        with:
+          publish-dir: ./out
+          production-deploy: true
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          deploy-message: "Deploy Web Prod to Netlify"
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_WEB_PROD_ID }}

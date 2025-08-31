@@ -3,6 +3,7 @@ name: Publish Web Main
 env:
   VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
   VERCEL_PROJECT_ID: ${{ secrets.VERCEL_WEB_TEST_ID }}
+  NETLIFY_AUTH_TOKEN: ${{ secrets.VERCEL_WEB_TEST_ID }}
 
 # Controls when the workflow will run
 on:
@@ -42,7 +43,20 @@ jobs:
         
       - name: Pull Vercel Environment
         run: yarn workspace @statstrade/web vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
-      - name: Build Web Test
+        
+      - name: Build Web Main
         run: yarn workspace @statstrade/web vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
-      - name: Deploy Web Test
+        
+      - name: Deploy Web Main 
         run: yarn workspace @statstrade/web vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Deploy Web Main to Netlify
+        uses: nwtgck/actions-netlify@v2.0
+        with:
+          publish-dir: ./out
+          production-deploy: true
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          deploy-message: "Deploy Web Main to Netlify"
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_WEB_TEST_ID }}
