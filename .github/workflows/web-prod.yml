@@ -12,7 +12,7 @@ on:
 
 jobs:
     
-  publish-web-prod:
+  publish-web-prod-vercel:
     runs-on: ubuntu-laprod
 
     steps:
@@ -50,13 +50,40 @@ jobs:
       - name: Deploy Web Prod
         run: yarn workspace @statstrade/web vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
 
-      - name: Deploy Web Prod to Netlify
-        uses: nwtgck/actions-netlify@v2.0
+    
+  publish-web-prod-netlify:
+    runs-on: ubuntu-laprod
+
+    steps:
+      # 1. Check out lite
+      - name: Checkout lite
+        uses: actions/checkout@v4
         with:
-          publish-dir: ./out
-          production-deploy: true
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          deploy-message: "Deploy Web Prod to Netlify"
+          repository: statstrade-dev/statstrade-lite
+          branch: prod
+          token: ${{ secrets.GH_TOKEN }} # Personal Access Token with repo write access
+
+      # 2. Install Node and Yarn
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+        
+      - name: Create .env.local from secret
         env:
-          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_TOKEN }}
-          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_WEB_PROD_ID }}
+          ENV_LOCAL: ${{ secrets.WEBAPP_ENV_PROD }}
+        run: |
+          # Write the content of the secret into .env.local
+          printf '%s\n' "$ENV_LOCAL" > .env.local
+        
+      - name: Build Web Prod
+        run: yarn workspace @statstrade/web next build
+
+      - name: Deploy Web Prod to Netlify
+        run: yarn workspace @statstrade/web netlify deploy --dir=projects/web/out --no-build --prod --auth=${{ secrets.NETLIFY_TOKEN }} --site=${{ secrets.NETLIFY_WEB_PROD_ID }}
+        
+

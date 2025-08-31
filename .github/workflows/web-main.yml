@@ -78,16 +78,8 @@ jobs:
           # Write the content of the secret into .env.local
           printf '%s\n' "$ENV_LOCAL" > .env.local
         
-      - name: Pull Vercel Environment
+      - name: Build Web Main
         run: yarn workspace @statstrade/web next build
 
       - name: Deploy Web Main to Netlify
-        uses: nwtgck/actions-netlify@v2.0
-        with:
-          publish-dir: ./statstrade-lite/projects/web/.next
-          production-deploy: true
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          deploy-message: "Deploy Web Main to Netlify"
-        env:
-          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_TOKEN }}
-          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_WEB_TEST_ID }}
+        run: yarn workspace @statstrade/web netlify deploy --dir=projects/web/out --no-build --prod --auth=${{ secrets.NETLIFY_TOKEN }} --site=${{ secrets.NETLIFY_WEB_TEST_ID }}
