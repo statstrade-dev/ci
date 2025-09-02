@@ -31,7 +31,7 @@ jobs:
         run: yarn install --frozen-lockfile
         
       - name: Build Storybook
-        run: yarn workspace @statstrade/storybook build:storybook
+        run: yarn workspace @statstrade/ui.storybook build:storybook
 
       - name: Deploy Storybook to Netlify
         run: yarn netlify deploy --filter @statstrade/ui.storybook --dir=projects/storybook/dist --no-build --prod --auth=${{ secrets.NETLIFY_TOKEN }} --site=${{ secrets.NETLIFY_STORYBOOK_ID }}
