@@ -13,7 +13,7 @@ on:
 jobs:
     
   publish-web-prod-vercel:
-    runs-on: ubuntu-laprod
+    runs-on: ubuntu-latest
 
     steps:
       # 1. Check out lite
@@ -52,7 +52,7 @@ jobs:
 
     
   publish-web-prod-netlify:
-    runs-on: ubuntu-laprod
+    runs-on: ubuntu-latest
 
     steps:
       # 1. Check out lite

@@ -9,7 +9,7 @@ on:
 jobs:
     
   publish-storybook:
-    runs-on: ubuntu-laprod
+    runs-on: ubuntu-latest
 
     steps:
       # 1. Check out lite
