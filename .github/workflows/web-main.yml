@@ -3,7 +3,6 @@ name: Publish Web Main
 env:
   VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
   VERCEL_PROJECT_ID: ${{ secrets.VERCEL_WEB_TEST_ID }}
-  NETLIFY_AUTH_TOKEN: ${{ secrets.VERCEL_WEB_TEST_ID }}
 
 # Controls when the workflow will run
 on:
@@ -79,11 +78,12 @@ jobs:
 #          printf '%s\n' "$ENV_LOCAL" > .env.local
         
       - name: Copy .env.local from projects/web/.env
-        env:
-          ENV_LOCAL: ${{ secrets.WEBAPP_ENV_PROD }}
         run: |
           # Write the content of the secret into .env.local
-          cp projects/web/.env/.env.test .env.local
+          cp projects/web/.env/.env.test projects/web/.env.local
 
       - name: Deploy Web Main to Netlify
-        run: yarn netlify deploy --prod --filter @statstrade/web --auth=${{ secrets.NETLIFY_TOKEN }} --site=${{ secrets.NETLIFY_WEB_TEST_ID }}
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_WEB_TEST_ID }}
+        run: yarn netlify deploy --prod --filter @statstrade/web
