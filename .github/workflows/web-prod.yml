@@ -81,16 +81,19 @@ jobs:
 #          printf '%s\n' "$ENV_LOCAL" > .env.local
         
       - name: Copy .env.local from projects/web/.env
-        env:
-          ENV_LOCAL: ${{ secrets.WEBAPP_ENV_PROD }}
         run: |
           # Write the content of the secret into .env.local
           cp projects/web/.env/.env.prod .env.local
         
-      - name: Build Web Prod
-        run: yarn workspace @statstrade/web next build
+      - name: Copy .env.local from projects/web/.env
+        run: |
+          # Write the content of the secret into .env.local
+          cp projects/web/.env/.env.test projects/web/.env.local
 
-      - name: Deploy Web Prod to Netlify
-        run: yarn netlify deploy --filter @statstrade/web --dir=projects/web/out --no-build --prod --auth=${{ secrets.NETLIFY_TOKEN }} --site=${{ secrets.NETLIFY_WEB_PROD_ID }}
+      - name: Deploy Web Main to Netlify
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_WEB_PROD_ID }}
+        run: yarn netlify deploy --prod --filter @statstrade/web
         
 
