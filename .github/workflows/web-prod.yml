@@ -83,12 +83,7 @@ jobs:
       - name: Copy .env.local from projects/web/.env
         run: |
           # Write the content of the secret into .env.local
-          cp projects/web/.env/.env.prod .env.local
-        
-      - name: Copy .env.local from projects/web/.env
-        run: |
-          # Write the content of the secret into .env.local
-          cp projects/web/.env/.env.test projects/web/.env.local
+          cp projects/web/.env/.env.prod projects/web/.env.local
 
       - name: Deploy Web Main to Netlify
         env:
