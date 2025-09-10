@@ -23,6 +23,9 @@ jobs:
           repository: statstrade-dev/statstrade-lite
           branch: prod
           token: ${{ secrets.GH_TOKEN }} # Personal Access Token with repo write access
+          
+      - name: Show full commit SHA
+        run: git rev-parse HEAD
 
       # 2. Install Node and Yarn
       - name: Set up Node.js
@@ -30,6 +33,9 @@ jobs:
         with:
           node-version: 24
           cache: 'yarn'
+
+      - name: Check Node version
+        run: node -v
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
@@ -62,6 +68,9 @@ jobs:
           repository: statstrade-dev/statstrade-lite
           branch: prod
           token: ${{ secrets.GH_TOKEN }} # Personal Access Token with repo write access
+          
+      - name: Show full commit SHA
+        run: git rev-parse HEAD
 
       # 2. Install Node and Yarn
       - name: Set up Node.js
@@ -69,6 +78,9 @@ jobs:
         with:
           node-version: 24
           cache: 'yarn'
+
+      - name: Check Node version
+        run: node -v
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
