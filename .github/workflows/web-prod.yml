@@ -40,12 +40,10 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
         
-      - name: Create .env.local from secret
-        env:
-          ENV_LOCAL: ${{ secrets.WEBAPP_ENV_PROD }}
+      - name: Copy .env.local from projects/web/.env
         run: |
           # Write the content of the secret into .env.local
-          printf '%s\n' "$ENV_LOCAL" > .env.local
+          cp projects/web/.env/.env.prod projects/web/.env.local
         
       - name: Pull Vercel Environment
         run: yarn workspace @statstrade/web vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
