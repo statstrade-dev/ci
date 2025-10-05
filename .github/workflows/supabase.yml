@@ -18,7 +18,7 @@ jobs:
       - name: Login to Supabase CLI (if interacting with a remote project)
         # This step is needed if you are resetting a *remote* Supabase project.
         # Ensure SUPABASE_ACCESS_TOKEN is set as a GitHub secret.
-        run: supabase login --access-token "${{ secrets.TEST_SUPABASE_SECRET_KEY }}"
+        run: supabase login --token "${{ secrets.TEST_SUPABASE_SECRET_KEY }}"
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.TEST_SUPABASE_SECRET_KEY }}
 
