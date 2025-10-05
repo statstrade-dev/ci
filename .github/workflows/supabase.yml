@@ -32,4 +32,4 @@ jobs:
       - name: Reset Supabase Database
         # Use --linked if resetting a remote project, otherwise it resets the local DB.
         # --no-backup can be used to prevent creating a backup before resetting.
-        run: supabase db reset --linked --no-backup
+        run: supabase db reset --linked
