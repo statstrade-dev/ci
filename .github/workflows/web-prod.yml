@@ -20,8 +20,9 @@ jobs:
       - name: Checkout lite
         uses: actions/checkout@v4
         with:
-          repository: statstrade-dev/statstrade-lite
+          repository: statstrade-dev/statstrade-v1
           branch: naren
+          path: src-js/sznui
           token: ${{ secrets.GH_TOKEN }} # Personal Access Token with repo write access
           
       - name: Show full commit SHA

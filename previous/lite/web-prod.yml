@@ -1,14 +1,18 @@
-name: Publish Storybook
+name: Publish Web Naren
+
+env:
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_WEB_PROD_ID }}
 
 # Controls when the workflow will run
 on:
   repository_dispatch:
-    types: [ui-changed]
+    types: [ui-changed-naren]
   workflow_dispatch:
 
 jobs:
-    
-  publish-storybook:
+
+  publish-web-naren-netlify:
     runs-on: ubuntu-latest
 
     steps:
@@ -16,9 +20,8 @@ jobs:
       - name: Checkout lite
         uses: actions/checkout@v4
         with:
-          repository: statstrade-dev/statstrade-v1
-          branch: prod
-          path: src-js/sznui
+          repository: statstrade-dev/statstrade-lite
+          branch: naren
           token: ${{ secrets.GH_TOKEN }} # Personal Access Token with repo write access
           
       - name: Show full commit SHA
@@ -36,9 +39,15 @@ jobs:
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
-        
-      - name: Build Storybook
-        run: yarn workspace @statstrade/ui.storybook build:storybook
+      - name: Copy .env.local from projects/web/.env
+        run: |
+          # Write the content of the secret into .env.local
+          cp projects/web/.env/.env.test projects/web/.env.local
 
-      - name: Deploy Storybook to Netlify
-        run: yarn netlify deploy --filter @statstrade/ui.storybook --dir=projects/storybook/dist --no-build --prod --auth=${{ secrets.NETLIFY_TOKEN }} --site=${{ secrets.NETLIFY_STORYBOOK_ID }}
+      - name: Deploy Web Main to Netlify
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_WEB_PROD_ID }}
+        run: yarn netlify deploy --prod --filter @statstrade/web
+        
+

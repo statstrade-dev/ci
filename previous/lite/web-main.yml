@@ -1,18 +1,18 @@
-name: Publish Web Prod
+name: Publish Web Main
 
 env:
   VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_WEB_PROD_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_WEB_TEST_ID }}
 
 # Controls when the workflow will run
 on:
   repository_dispatch:
-    types: [ui-changed-prod]
+    types: [ui-changed]
   workflow_dispatch:
 
 jobs:
     
-  publish-web-prod-vercel:
+  publish-web-main-vercel:
     runs-on: ubuntu-latest
 
     steps:
@@ -20,11 +20,9 @@ jobs:
       - name: Checkout lite
         uses: actions/checkout@v4
         with:
-          repository: statstrade-dev/statstrade-v1
-          branch: prod
-          path: src-js/sznui
+          repository: statstrade-dev/statstrade-lite
           token: ${{ secrets.GH_TOKEN }} # Personal Access Token with repo write access
-          
+
       - name: Show full commit SHA
         run: git rev-parse HEAD
 
@@ -44,19 +42,18 @@ jobs:
       - name: Copy .env.local from projects/web/.env
         run: |
           # Write the content of the secret into .env.local
-          cp projects/web/.env/.env.prod projects/web/.env.local
+          cp projects/web/.env/.env.test projects/web/.env.local
         
       - name: Pull Vercel Environment
         run: yarn workspace @statstrade/web vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
         
-      - name: Build Web Prod
+      - name: Build Web Main
         run: yarn workspace @statstrade/web vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
-      
-      - name: Deploy Web Prod
+        
+      - name: Deploy Web Main 
         run: yarn workspace @statstrade/web vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
-
     
-  publish-web-prod-netlify:
+  publish-web-main-netlify:
     runs-on: ubuntu-latest
 
     steps:
@@ -64,9 +61,7 @@ jobs:
       - name: Checkout lite
         uses: actions/checkout@v4
         with:
-          repository: statstrade-dev/statstrade-v1
-          branch: prod
-          path: src-js/sznui
+          repository: statstrade-dev/statstrade-lite
           token: ${{ secrets.GH_TOKEN }} # Personal Access Token with repo write access
           
       - name: Show full commit SHA
@@ -87,7 +82,7 @@ jobs:
         
 #      - name: Create .env.local from secret
 #        env:
-#          ENV_LOCAL: ${{ secrets.WEBAPP_ENV_PROD }}
+#          ENV_LOCAL: ${{ secrets.WEBAPP_ENV_TEST }}
 #        run: |
 #          # Write the content of the secret into .env.local
 #          printf '%s\n' "$ENV_LOCAL" > .env.local
@@ -95,12 +90,10 @@ jobs:
       - name: Copy .env.local from projects/web/.env
         run: |
           # Write the content of the secret into .env.local
-          cp projects/web/.env/.env.prod projects/web/.env.local
+          cp projects/web/.env/.env.test projects/web/.env.local
 
       - name: Deploy Web Main to Netlify
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_TOKEN }}
-          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_WEB_PROD_ID }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_WEB_TEST_ID }}
         run: yarn netlify deploy --prod --filter @statstrade/web
-        
-
