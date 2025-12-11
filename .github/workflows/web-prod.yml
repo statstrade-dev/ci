@@ -7,7 +7,7 @@ env:
 # Controls when the workflow will run
 on:
   repository_dispatch:
-    types: [ui-changed-prod]
+    types: [ui-changed-prod ui-changed]
   workflow_dispatch:
 
 jobs:
