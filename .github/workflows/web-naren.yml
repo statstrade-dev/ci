@@ -15,6 +15,10 @@ jobs:
   publish-web-naren-netlify:
     runs-on: ubuntu-latest
 
+    defaults:
+      run:
+        working-directory: src-js/sznui
+
     steps:
       # 1. Check out lite
       - name: Checkout lite
