@@ -25,7 +25,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: statstrade-dev/statstrade-v1
-          path: src-js/sznui-app
+          # path: src-js/sznui-app
           token: ${{ secrets.GH_TOKEN }} # Personal Access Token with repo write access
 
       - name: Show full commit SHA
