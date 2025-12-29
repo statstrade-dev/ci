@@ -39,8 +39,12 @@ jobs:
           cache: 'yarn'
           cache-dependency-path: src-js/sznui-app/yarn.lock
 
-      - name: Check Node version
-        run: node -v
+      - name: Enable Corepack and Check Versions
+        run: |
+          corepack enable
+          node -v
+          yarn --version
+          ls -al
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
@@ -86,8 +90,12 @@ jobs:
           cache: 'yarn'
           cache-dependency-path: src-js/sznui-app/yarn.lock
 
-      - name: Check Node version
-        run: node -v
+      - name: Enable Corepack and Check Versions
+        run: |
+          corepack enable
+          node -v
+          yarn --version
+          ls -al
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
