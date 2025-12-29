@@ -1,0 +1,62 @@
+name: Run Statstrade V1 Tests
+
+on:
+  repository_dispatch:
+    types: [v1-changed]
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    
+    steps:
+      - name: Checkout statstrade-v1
+        uses: actions/checkout@v4
+        with:
+          repository: statstrade-dev/statstrade-v1
+          path: statstrade-v1
+          token: ${{ secrets.GH_TOKEN }}
+          ref: ${{ github.event.client_payload.sha }}
+          submodules: recursive
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Start Supabase
+        working-directory: statstrade-v1
+        run: |
+          supabase start
+          supabase status -o json > supabase.json
+
+      - name: Configure Environment
+        working-directory: statstrade-v1
+        run: |
+          API_URL=$(jq -r .api_url supabase.json)
+          DB_URL=$(jq -r .db_url supabase.json)
+          ANON_KEY=$(jq -r .anon_key supabase.json)
+          SERVICE_KEY=$(jq -r .service_role_key supabase.json)
+          
+          cp .env.sample .env
+          
+          sed -i "s|DEFAULT_SUPABASE_API_ENDPOINT=.*|DEFAULT_SUPABASE_API_ENDPOINT=\"$API_URL\"|g" .env
+          sed -i "s|DEFAULT_SUPABASE_DB_ENDPOINT=.*|DEFAULT_SUPABASE_DB_ENDPOINT=\"$DB_URL\"|g" .env
+          sed -i "s|DEFAULT_SUPABASE_API_KEY_ANON=.*|DEFAULT_SUPABASE_API_KEY_ANON=\"$ANON_KEY\"|g" .env
+          sed -i "s|DEFAULT_SUPABASE_API_KEY_SERVICE=.*|DEFAULT_SUPABASE_API_KEY_SERVICE=\"$SERVICE_KEY\"|g" .env
+
+      - name: Log into registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ secrets.GH_USER }}
+          password: ${{ secrets.GH_TOKEN }}
+
+      - name: Run Tests
+        run: >
+          docker run --rm --network host
+          -v $(pwd)/statstrade-v1:/workspace -w /workspace
+          -v /var/run/docker.sock:/var/run/docker.sock:ro
+          ghcr.io/zcaudate-xyz/infra-foundation-dev:ci 
+          bash -c 'make deps-checkouts && lein test'
