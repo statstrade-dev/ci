@@ -37,6 +37,7 @@ jobs:
         with:
           node-version: 24
           cache: 'yarn'
+          cache-dependency-path: src-js/sznui-app/yarn.lock
 
       - name: Check Node version
         run: node -v
@@ -83,6 +84,7 @@ jobs:
         with:
           node-version: 24
           cache: 'yarn'
+          cache-dependency-path: src-js/sznui-app/yarn.lock
 
       - name: Check Node version
         run: node -v
