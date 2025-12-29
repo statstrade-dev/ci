@@ -41,8 +41,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 24
-          cache: 'yarn'
-          cache-dependency-path: src-js/sznui-app/yarn.lock
 
       - name: Enable Corepack and Check Versions
         run: |
@@ -92,8 +90,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 24
-          cache: 'yarn'
-          cache-dependency-path: src-js/sznui-app/yarn.lock
 
       - name: Enable Corepack and Check Versions
         run: |
