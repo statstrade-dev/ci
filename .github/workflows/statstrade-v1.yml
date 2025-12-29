@@ -46,6 +46,12 @@ jobs:
           sed -i "s|DEFAULT_SUPABASE_API_KEY_ANON=.*|DEFAULT_SUPABASE_API_KEY_ANON=\"$ANON_KEY\"|g" .env
           sed -i "s|DEFAULT_SUPABASE_API_KEY_SERVICE=.*|DEFAULT_SUPABASE_API_KEY_SERVICE=\"$SERVICE_KEY\"|g" .env
 
+          if grep -q "DEFAULT_RT_POSTGRES_VENDOR=" .env; then
+            sed -i "s|DEFAULT_RT_POSTGRES_VENDOR=.*|DEFAULT_RT_POSTGRES_VENDOR=lib.postgres.impl.impossibl|g" .env
+          else
+            echo "DEFAULT_RT_POSTGRES_VENDOR=lib.postgres.impl.impossibl" >> .env
+          fi
+
       - name: Setup Java
         uses: actions/setup-java@v3
         with:
