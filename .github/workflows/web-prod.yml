@@ -37,10 +37,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 24
-          cache: 'yarn'
 
-      - name: Check Node version
-        run: node -v
+      - name: Enable Corepack and Check Versions
+        run: |
+          corepack enable
+          node -v
+          yarn --version
+          ls -al
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
@@ -85,10 +88,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 24
-          cache: 'yarn'
 
-      - name: Check Node version
-        run: node -v
+      - name: Enable Corepack and Check Versions
+        run: |
+          corepack enable
+          node -v
+          yarn --version
+          ls -al
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
@@ -111,4 +117,3 @@ jobs:
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_WEB_PROD_ID }}
         run: yarn netlify deploy --prod --filter @statstrade/web
         
-
