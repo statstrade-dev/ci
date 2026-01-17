@@ -46,22 +46,11 @@ jobs:
           sed -i "s|DEFAULT_SUPABASE_API_KEY_ANON=.*|DEFAULT_SUPABASE_API_KEY_ANON=\"$ANON_KEY\"|g" .env
           sed -i "s|DEFAULT_SUPABASE_API_KEY_SERVICE=.*|DEFAULT_SUPABASE_API_KEY_SERVICE=\"$SERVICE_KEY\"|g" .env
 
-      - name: Setup Java
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'zulu'
-          java-version: '17'
-
-      - name: Setup Clojure
-        uses: DeLaGuardo/setup-clojure@12.1
-        with:
-          lein: latest
-
       - name: Run Tests
         working-directory: statstrade-v1
         run: |
-          cd cache/foundation
-          lein install
-          cd ../..
-          make deps-checkouts
-          lein test
+          docker run --rm --network host \
+            -v $(pwd):/app \
+            -w /app \
+            clojure:temurin-17-lein \
+            /bin/bash -c "apt-get update && apt-get install -y make git && cd cache/foundation && lein install && cd /app && make deps-checkouts && lein test"
