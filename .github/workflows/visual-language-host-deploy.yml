@@ -165,7 +165,7 @@ jobs:
           {
             grep -v -E '^/visual-language([[:space:]]|/)' "$existing_redirects" || true
             printf '%s\n' \
-              "/visual-language /visual-language/ 301" \
+              "/visual-language ${target_site_url%/}/ 200" \
               "/visual-language/* ${target_site_url%/}/:splat 200"
           } > "$new_redirects"
           redirects_sha="$(sha1sum "$new_redirects" | awk '{print $1}')"
