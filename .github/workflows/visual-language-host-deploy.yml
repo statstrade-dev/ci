@@ -110,7 +110,9 @@ jobs:
           done
 
           curl --fail --silent --show-error --location --retry 5 \
-            "${target_site_url%/}/" | grep -q "Statstrade"
+            --output /tmp/visual-language-home.html \
+            "${target_site_url%/}/"
+          grep -q "Statstrade" /tmp/visual-language-home.html
 
           sites_json="$(curl --fail-with-body --silent --show-error \
             --header "$auth_header" \
@@ -226,9 +228,13 @@ jobs:
           done
 
           curl --fail --silent --show-error --location --retry 5 \
-            "${BUILD_HOST}/visual-language/" | grep -q "Statstrade"
+            --output /tmp/build-visual-language-home.html \
+            "${BUILD_HOST}/visual-language/"
+          grep -q "Statstrade" /tmp/build-visual-language-home.html
           curl --fail --silent --show-error --location --retry 5 \
-            "${BUILD_HOST}/visual-language/ui/" | grep -q "Statstrade"
+            --output /tmp/build-visual-language-ui.html \
+            "${BUILD_HOST}/visual-language/ui/"
+          grep -q "Statstrade" /tmp/build-visual-language-ui.html
           curl --fail --silent --show-error --location \
             "${BUILD_HOST}/" > /dev/null
 
