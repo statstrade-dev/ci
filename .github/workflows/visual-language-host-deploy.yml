@@ -3,7 +3,7 @@ name: Publish visual-language on Build host
 on:
   push:
     branches:
-      - agent/visual-language-host-deploy
+      - main
   workflow_dispatch:
 
 permissions:
