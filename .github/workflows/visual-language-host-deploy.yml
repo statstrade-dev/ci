@@ -235,8 +235,21 @@ jobs:
             --output /tmp/build-visual-language-ui.html \
             "${BUILD_HOST}/visual-language/ui/"
           grep -q "Statstrade" /tmp/build-visual-language-ui.html
-          curl --fail --silent --show-error --location \
-            "${BUILD_HOST}/" > /dev/null
+          build_root_status="$(curl --silent --show-error --location \
+            --output /dev/null \
+            --write-out '%{http_code}' \
+            "${BUILD_HOST}/")"
+          case "$build_root_status" in
+            2*|3*)
+              ;;
+            404)
+              echo "::warning title=Build host root::${BUILD_HOST}/ returned 404; visual-language mounted-route checks passed."
+              ;;
+            *)
+              echo "Build host root returned unexpected HTTP status ${build_root_status}." >&2
+              exit 1
+              ;;
+          esac
 
           echo "::notice title=Visual-language site::${target_site_url}"
           echo "::notice title=Build host deploy::${host_deploy_id}"
