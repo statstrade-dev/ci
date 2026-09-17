@@ -1,0 +1,242 @@
+name: Publish visual-language on Build host
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_TOKEN }}
+      TARGET_SITE_NAME: statstrade-visual-language
+      BUILD_HOST: https://build.statstrade.io
+      NETLIFY_API: https://api.netlify.com/api/v1
+
+    steps:
+      - name: Checkout visual-language
+        uses: actions/checkout@v4
+        with:
+          repository: statstrade-dev/statstrade-visual-language
+          ref: main
+          path: visual-language
+          token: ${{ secrets.GH_TOKEN }}
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: visual-language/package-lock.json
+
+      - name: Build visual-language
+        working-directory: visual-language
+        run: |
+          npm ci
+          BASE_PATH=/visual-language npm run build
+
+      - name: Deploy visual-language and add the Build route
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [[ -z "${NETLIFY_AUTH_TOKEN:-}" ]]; then
+            echo "The CI repository does not have NETLIFY_TOKEN available." >&2
+            exit 1
+          fi
+
+          api="$NETLIFY_API"
+          auth_header="Authorization: Bearer ${NETLIFY_AUTH_TOKEN}"
+
+          sites_json="$(curl --fail-with-body --silent --show-error \
+            --header "$auth_header" \
+            "${api}/sites?per_page=100")"
+          target_site_id="$(jq -r --arg name "$TARGET_SITE_NAME" \
+            '.[] | select(.name == $name) | .id' <<<"$sites_json" | head -n 1)"
+
+          if [[ -z "$target_site_id" || "$target_site_id" == "null" ]]; then
+            target_site_json="$(curl --fail-with-body --silent --show-error \
+              --request POST \
+              --header "$auth_header" \
+              --header "Content-Type: application/json" \
+              --data "$(jq -nc --arg name "$TARGET_SITE_NAME" '{name: $name}')" \
+              "${api}/sites")"
+            target_site_id="$(jq -r '.id' <<<"$target_site_json")"
+          else
+            target_site_json="$(curl --fail-with-body --silent --show-error \
+              --header "$auth_header" \
+              "${api}/sites/${target_site_id}")"
+          fi
+
+          target_site_url="$(jq -r '.ssl_url // .url // empty' <<<"$target_site_json")"
+          if [[ -z "$target_site_id" || "$target_site_id" == "null" || -z "$target_site_url" ]]; then
+            echo "Netlify did not return complete visual-language site metadata." >&2
+            exit 1
+          fi
+
+          (cd visual-language/build && zip -qr /tmp/statstrade-visual-language.zip .)
+          target_deploy_json="$(curl --fail-with-body --silent --show-error \
+            --request POST \
+            --header "$auth_header" \
+            --header "Content-Type: application/zip" \
+            --data-binary @/tmp/statstrade-visual-language.zip \
+            "${api}/sites/${target_site_id}/deploys")"
+          target_deploy_id="$(jq -r '.id' <<<"$target_deploy_json")"
+
+          for attempt in $(seq 1 60); do
+            target_deploy_json="$(curl --fail-with-body --silent --show-error \
+              --header "$auth_header" \
+              "${api}/deploys/${target_deploy_id}")"
+            target_state="$(jq -r '.state' <<<"$target_deploy_json")"
+            case "$target_state" in
+              ready)
+                break
+                ;;
+              error|canceled)
+                jq '{state, error_message, deploy_id: .id}' <<<"$target_deploy_json" >&2
+                exit 1
+                ;;
+            esac
+            if [[ "$attempt" == "60" ]]; then
+              echo "Timed out waiting for visual-language Netlify deploy ${target_deploy_id}." >&2
+              exit 1
+            fi
+            sleep 2
+          done
+
+          curl --fail --silent --show-error --location --retry 5 \
+            --output /tmp/visual-language-home.html \
+            "${target_site_url%/}/"
+          grep -q "Statstrade" /tmp/visual-language-home.html
+
+          sites_json="$(curl --fail-with-body --silent --show-error \
+            --header "$auth_header" \
+            "${api}/sites?per_page=100")"
+          build_site_id="$(jq -r '.[] | select(
+            .custom_domain == "build.statstrade.io"
+            or ((.domain_aliases // []) | index("build.statstrade.io"))
+          ) | .id' <<<"$sites_json" | head -n 1)"
+          if [[ -z "$build_site_id" || "$build_site_id" == "null" ]]; then
+            echo "Could not resolve the Netlify site for build.statstrade.io." >&2
+            exit 1
+          fi
+
+          build_site_json="$(curl --fail-with-body --silent --show-error \
+            --header "$auth_header" \
+            "${api}/sites/${build_site_id}")"
+          current_deploy_id="$(jq -r '.published_deploy.id // empty' <<<"$build_site_json")"
+          if [[ -z "$current_deploy_id" ]]; then
+            echo "The Build site has no published deploy to preserve." >&2
+            exit 1
+          fi
+
+          files_json="$(curl --fail-with-body --silent --show-error \
+            --header "$auth_header" \
+            "${api}/deploys/${current_deploy_id}/files")"
+          functions_json="$(curl --fail-with-body --silent --show-error \
+            --header "$auth_header" \
+            "${api}/deploys/${current_deploy_id}/functions")"
+          file_manifest="$(jq -c 'map({key: .path, value: .sha}) | from_entries' <<<"$files_json")"
+          function_manifest="$(jq -c \
+            '.functions | map(select(.n != null and .d != null) | {key: .n, value: .d}) | from_entries' \
+            <<<"$functions_json")"
+
+          existing_redirect_path="$(jq -r '[.[] | select(
+            .path == "/_redirects" or .path == "_redirects"
+          ) | .path][0] // empty' <<<"$files_json")"
+          existing_redirects=/tmp/build-redirects-existing
+          if [[ -n "$existing_redirect_path" ]]; then
+            existing_redirect_file="${existing_redirect_path#/}"
+            curl --fail-with-body --silent --show-error \
+              --header "$auth_header" \
+              --header "Content-Type: application/vnd.bitballoon.v1.raw" \
+              "${api}/sites/${build_site_id}/files/${existing_redirect_file}" \
+              > "$existing_redirects"
+          else
+            : > "$existing_redirects"
+          fi
+
+          new_redirects=/tmp/build-redirects
+          {
+            grep -v -E '^/visual-language([[:space:]]|/)' "$existing_redirects" || true
+            printf '%s\n' \
+              "/visual-language ${target_site_url%/}/ 200" \
+              "/visual-language/* ${target_site_url%/}/:splat 200"
+          } > "$new_redirects"
+          redirects_sha="$(sha1sum "$new_redirects" | awk '{print $1}')"
+          file_manifest="$(jq -c --arg sha "$redirects_sha" \
+            '. + {"/_redirects": $sha}' <<<"$file_manifest")"
+          deploy_payload="$(jq -cn \
+            --argjson files "$file_manifest" \
+            --argjson functions "$function_manifest" \
+            '{files: $files, functions: $functions}')"
+
+          host_deploy_json="$(curl --fail-with-body --silent --show-error \
+            --request POST \
+            --header "$auth_header" \
+            --header "Content-Type: application/json" \
+            --data "$deploy_payload" \
+            "${api}/sites/${build_site_id}/deploys")"
+          host_deploy_id="$(jq -r '.id' <<<"$host_deploy_json")"
+
+          required_file_hashes="$(jq -r '.required[]? // empty' <<<"$host_deploy_json")"
+          while IFS= read -r required_hash; do
+            [[ -z "$required_hash" ]] && continue
+            if [[ "$required_hash" != "$redirects_sha" ]]; then
+              echo "The Build deploy requested an unexpected file hash: ${required_hash}" >&2
+              exit 1
+            fi
+            curl --fail-with-body --silent --show-error \
+              --request PUT \
+              --header "$auth_header" \
+              --header "Content-Type: application/octet-stream" \
+              --data-binary @"$new_redirects" \
+              "${api}/deploys/${host_deploy_id}/files/_redirects"
+          done <<<"$required_file_hashes"
+
+          required_function_hashes="$(jq -r '.required_functions[]? // empty' <<<"$host_deploy_json")"
+          if [[ -n "$required_function_hashes" ]]; then
+            echo "The Build deploy requested function uploads; refusing to publish without preserving them." >&2
+            printf '%s\n' "$required_function_hashes" >&2
+            exit 1
+          fi
+
+          for attempt in $(seq 1 60); do
+            host_deploy_json="$(curl --fail-with-body --silent --show-error \
+              --header "$auth_header" \
+              "${api}/deploys/${host_deploy_id}")"
+            host_state="$(jq -r '.state' <<<"$host_deploy_json")"
+            case "$host_state" in
+              ready)
+                break
+                ;;
+              error|canceled)
+                jq '{state, error_message, deploy_id: .id}' <<<"$host_deploy_json" >&2
+                exit 1
+                ;;
+            esac
+            if [[ "$attempt" == "60" ]]; then
+              echo "Timed out waiting for Build host deploy ${host_deploy_id}." >&2
+              exit 1
+            fi
+            sleep 2
+          done
+
+          curl --fail --silent --show-error --location --retry 5 \
+            --output /tmp/build-visual-language-home.html \
+            "${BUILD_HOST}/visual-language/"
+          grep -q "Statstrade" /tmp/build-visual-language-home.html
+          curl --fail --silent --show-error --location --retry 5 \
+            --output /tmp/build-visual-language-ui.html \
+            "${BUILD_HOST}/visual-language/ui/"
+          grep -q "Statstrade" /tmp/build-visual-language-ui.html
+          curl --fail --silent --show-error --location \
+            "${BUILD_HOST}/" > /dev/null
+
+          echo "::notice title=Visual-language site::${target_site_url}"
+          echo "::notice title=Build host deploy::${host_deploy_id}"
